@@ -1,11 +1,56 @@
-.venv/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+.venv/
+venv/
 
-.env
-
-data/raw/*
-data/processed/*
-
+# Testing
 .pytest_cache/
+.coverage
+htmlcov/
+
+# Ruff
 .ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Project data
+data/raw/*
+data/interim/*
+data/features/*
+
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/features/.gitkeep
+
+# Model artifacts
+models/checkpoints/*
+models/registry/*
+
+!models/checkpoints/.gitkeep
+!models/registry/.gitkeep
+
+# Experiment tracking
+mlruns/
+wandb/
+artifacts/
