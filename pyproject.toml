@@ -40,3 +40,13 @@ split-on-trailing-comma = false
 [tool.ruff.lint.per-file-ignores]
 "src/dengue_mlops/ingestion/skdr/ocr.py" = ["BLE001"]
 "scripts/build_dengue_dataset.py" = ["BLE001"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dengue_mlops"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -34,13 +34,20 @@ Thumbs.db
 *.log
 logs/
 
-# Project data
+# Raw data
 data/raw/*
-data/interim/*
-data/features/*
-
 !data/raw/.gitkeep
+
+# Intermediate data
+data/interim/*
 !data/interim/.gitkeep
+
+# Processed data
+data/processed/*
+!data/processed/.gitkeep
+
+# Features
+data/features/*
 !data/features/.gitkeep
 
 # Model artifacts
