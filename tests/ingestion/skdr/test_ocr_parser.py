@@ -20,18 +20,6 @@ def test_merge_number_candidates():
             {
                 "text": "421",
                 "value": 421,
-                "confidence": 0.80,
-                "center_x": 100.0,
-                "center_y": 50.0,
-                "x_left": 90.0,
-                "x_right": 110.0,
-                "y_top": 45.0,
-                "y_bottom": 55.0,
-                "preprocess": "threshold_40",
-            },
-            {
-                "text": "421",
-                "value": 421,
                 "confidence": 0.90,
                 "center_x": 102.0,
                 "center_y": 52.0,
@@ -41,18 +29,36 @@ def test_merge_number_candidates():
                 "y_bottom": 57.0,
                 "preprocess": "otsu",
             },
+            {
+                "text": "421",
+                "value": 421,
+                "confidence": 0.80,
+                "center_x": 100.0,
+                "center_y": 50.0,
+                "x_left": 90.0,
+                "x_right": 110.0,
+                "y_top": 45.0,
+                "y_bottom": 55.0,
+                "preprocess": "threshold_40",
+            },
         ]
     )
 
     result = merge_number_candidates(df)
 
-    assert len(result) == 1
-    assert result.iloc[0]["value"] == 421
-    assert result.iloc[0]["confidence"] == 0.90
+    assert len(result) == 2
+    assert result.iloc[0]["center_y"] == 50.0
+    assert result.iloc[1]["center_y"] == 52.0
 
 
 def test_build_row_centers():
-    df = pd.DataFrame([{"center_y": 100.0}, {"center_y": 103.0}, {"center_y": 200.0}])
+    df = pd.DataFrame(
+        [
+            {"center_y": 100.0},
+            {"center_y": 103.0},
+            {"center_y": 200.0},
+        ]
+    )
 
     centers = build_row_centers(df)
 
