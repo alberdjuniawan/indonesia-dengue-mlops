@@ -1,0 +1,20 @@
+project:
+  name: indonesia-dengue-mlops
+  seed: 42
+
+data:
+  expected_province_count: 38
+  target_column: cases
+  year_column: year
+  week_column: week
+  province_column: province
+
+model:
+  target_horizon: 1
+
+training:
+  random_state: 42
+
+monitoring:
+  error_threshold: 0.20
+  drift_method: psi
