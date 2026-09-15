@@ -80,6 +80,15 @@ Then verify the environment:
 python --version
 uv run pytest
 uv run ruff check .
+uv run ruff format --check .
+```
+
+### Code Formatting
+
+Formatting is enforced by `ruff` (`line-length = 100`). Install hooks once:
+
+```bash
+uv run pre-commit install
 ```
 
 ## License
