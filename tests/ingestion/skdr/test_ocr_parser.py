@@ -52,13 +52,7 @@ def test_merge_number_candidates():
 
 
 def test_build_row_centers():
-    df = pd.DataFrame(
-        [
-            {"center_y": 100.0},
-            {"center_y": 103.0},
-            {"center_y": 200.0},
-        ]
-    )
+    df = pd.DataFrame([{"center_y": 100.0}, {"center_y": 103.0}, {"center_y": 200.0}])
 
     centers = build_row_centers(df)
 

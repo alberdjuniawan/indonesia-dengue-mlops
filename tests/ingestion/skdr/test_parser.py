@@ -2,7 +2,7 @@ from pathlib import Path
 
 from dengue_mlops.ingestion.skdr.parser import parse_dengue_page
 
-PDF_PATH = Path("tests/fixtures/sample_skdr.pdf")
+PDF_PATH = Path("tests/fixtures/skdr/sample_skdr.pdf")
 
 
 def test_parse_dengue_page():
