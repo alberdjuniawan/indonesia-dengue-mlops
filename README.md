@@ -14,6 +14,30 @@ SKDR PDF -> Page Discovery -> Dengue Page Extraction -> PDF Text / OCR -> Provin
 
 PDF text extraction is used when possible, with OCR as a fallback for reports that cannot be extracted completely.
 
+## Weather Data Pipeline
+
+ERA5-Land reanalysis from Copernicus CDS is ingested per province and aligned to SKDR ISO weeks:
+
+```text
+Province Boundaries -> Representative Points -> CDS ERA5-Land (hourly, NetCDF) -> Parse & Derive (humidity, wind_speed) -> Weekly Aggregation (ISO week, UTC) -> Alignment with SKDR -> weather_weekly.csv
+```
+
+* **Source:** `reanalysis-era5-land-timeseries` via `cdsapi` (`2m_temperature`, `2m_dewpoint_temperature`, `surface_pressure`, `10m_u/v_component_of_wind`, `total_precipitation`).
+* **Spatial:** `data/raw/boundaries/indonesia_provinces.geojson` → `load_province_boundaries` → `build_province_points` (representative point per province, EPSG:4326).
+* **Parsing:** `src/dengue_mlops/ingestion/weather/parser.py` extracts CDS ZIP, merges NetCDF frames (`outer` join), derives `humidity` (Magnus) and `wind_speed`.
+* **Aggregation:** `aggregation.py` groups hourly `valid_time` by ISO `year`/`week` → `temperature_mean_c`, `humidity_mean`, `pressure_mean_pa`, `wind_speed_mean`, `precipitation_sum_mm` + `hour_count`.
+* **Alignment:** `alignment.py` left-joins weekly weather to SKDR periods from `data/processed/dengue.csv` and flags `weather_complete`.
+
+Run:
+
+```bash
+python scripts/download_boundaries.py
+python scripts/fetch_weather.py --help
+python scripts/fetch_weather.py --skip-existing
+# output: data/processed/weather_weekly.csv
+# raw archives: data/raw/weather/era5/era5_land_timeseries_<PROVINCE>_<start>_<end>.zip
+```
+
 ## Project Structure
 
 ```text
@@ -26,8 +50,10 @@ indonesia-dengue-mlops/
 │   │   ├── skdr/
 │   │   │   ├── 2025/
 │   │   │   └── 2026/
-│   │   ├── bmkg/
-│   │   └── population/
+│   │   ├── boundaries/
+│   │   │   └── indonesia_provinces.geojson
+│   │   └── weather/
+│   │       └── era5/
 │   ├── interim/
 │   ├── processed/
 │   └── features/
@@ -53,16 +79,11 @@ Raw datasets and generated data are not stored in Git. `.gitkeep` files are used
 
 - Python 3.12
 - uv
-- pandas
-- PyMuPDF
-- OpenCV
-- PaddleOCR
-- EasyOCR
-- PyTorch
-- pytest
-- Ruff
-- GitHub Codespaces
-- GitHub Actions
+- pandas, geopandas, xarray, h5netcdf
+- PyMuPDF, OpenCV, PaddleOCR, EasyOCR, PyTorch
+- cdsapi (Copernicus CDS), shapely
+- pytest, Ruff
+- GitHub Codespaces, GitHub Actions
 
 ## GitHub Codespaces
 
