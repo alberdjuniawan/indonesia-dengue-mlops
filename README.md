@@ -9,10 +9,23 @@ The system combines several data sources, including dengue surveillance data, we
 SKDR dengue surveillance reports are processed from raw PDF files into structured CSV data through the following pipeline:
 
 ```text
-SKDR PDF -> Page Discovery -> Dengue Page Extraction -> PDF Text / OCR -> Province & Case Matching -> Validation -> Processed CSV
+SKDR PDF -> Download -> Page Discovery -> Render & Layout Detection -> PDF Text / OCR -> Province & Case Matching -> Validation -> dengue.csv
 ```
 
-PDF text extraction is used when possible, with OCR as a fallback for reports that cannot be extracted completely.
+* **Source:** `https://surveilans.kemkes.go.id` via `discovery.py:build_pdf_url` -> `downloader.py:download_pdf` -> `data/raw/skdr/<year>/Mxx_<year>.pdf`.
+* **Discovery:** `page_locator.py:find_dengue_pages` keyword `Kasus Suspek Dengue Berdasarkan Provinsi` (`page_locator.py:6`).
+* **Layout:** `ocr.py:render_page` (RENDER_SCALE 2.0) -> `detect_layout` (PaddleOCR) -> `select_target_chart` -> `crop_target_chart` -> `mask_non_chart_regions` (excluded bboxes for text/OCR).
+* **Text layer:** `parser.py:parse_dengue_page` with `chart_bbox` + `excluded_bboxes`, `NUMBER_PATTERN`, `MAX_ROW_Y_DISTANCE=8`, `match_province` (0.55).
+* **OCR fallback:** `ocr_parser.py` + `ocr.py:extract_province_candidates` / `extract_number_candidates` / `recover_missing_province_candidates` -> `build_rows_from_candidates` (38 provinces, trigram similarity).
+* **Validation:** `validator.py:validate_dengue_rows` checks 38 provinces, duplicates, invalid rows -> `VALID`/`PARTIAL`/`INVALID`/`IMAGE_ONLY`.
+
+Run:
+
+```bash
+python scripts/download_skdr.py
+python scripts/build_dengue_dataset.py
+# outputs: data/processed/dengue.csv, data/processed/dengue_ingestion_report.csv
+```
 
 ## Weather Data Pipeline
 
@@ -23,9 +36,9 @@ Province Boundaries -> Representative Points -> CDS ERA5-Land (hourly, NetCDF) -
 ```
 
 * **Source:** `reanalysis-era5-land-timeseries` via `cdsapi` (`2m_temperature`, `2m_dewpoint_temperature`, `surface_pressure`, `10m_u/v_component_of_wind`, `total_precipitation`).
-* **Spatial:** `data/raw/boundaries/indonesia_provinces.geojson` → `load_province_boundaries` → `build_province_points` (representative point per province, EPSG:4326).
+* **Spatial:** `data/raw/boundaries/indonesia_provinces.geojson` -> `load_province_boundaries` -> `build_province_points` (representative point per province, EPSG:4326).
 * **Parsing:** `src/dengue_mlops/ingestion/weather/parser.py` extracts CDS ZIP, merges NetCDF frames (`outer` join), derives `humidity` (Magnus) and `wind_speed`.
-* **Aggregation:** `aggregation.py` groups hourly `valid_time` by ISO `year`/`week` → `temperature_mean_c`, `humidity_mean`, `pressure_mean_pa`, `wind_speed_mean`, `precipitation_sum_mm` + `hour_count`.
+* **Aggregation:** `aggregation.py` groups hourly `valid_time` by ISO `year`/`week` -> `temperature_mean_c`, `humidity_mean`, `pressure_mean_pa`, `wind_speed_mean`, `precipitation_sum_mm` + `hour_count`.
 * **Alignment:** `alignment.py` left-joins weekly weather to SKDR periods from `data/processed/dengue.csv` and flags `weather_complete`.
 
 Run:
