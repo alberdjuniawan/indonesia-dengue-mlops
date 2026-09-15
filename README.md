@@ -22,8 +22,8 @@ SKDR PDF -> Download -> Page Discovery -> Render & Layout Detection -> PDF Text 
 Run:
 
 ```bash
-python scripts/download_skdr.py
-python scripts/build_dengue_dataset.py
+uv run python scripts/download_skdr.py
+uv run python scripts/build_dengue_dataset.py
 # outputs: data/processed/dengue.csv, data/processed/dengue_ingestion_report.csv
 ```
 
@@ -44,9 +44,9 @@ Province Boundaries -> Representative Points -> CDS ERA5-Land (hourly, NetCDF) -
 Run:
 
 ```bash
-python scripts/download_boundaries.py
-python scripts/fetch_weather.py --help
-python scripts/fetch_weather.py --skip-existing
+uv run python scripts/download_boundaries.py
+uv run python scripts/fetch_weather.py --help
+uv run python scripts/fetch_weather.py --skip-existing
 # output: data/processed/weather_weekly.csv
 # raw archives: data/raw/weather/era5/era5_land_timeseries_<PROVINCE>_<start>_<end>.zip
 ```
@@ -105,13 +105,13 @@ The development environment is configured using `.devcontainer/devcontainer.json
 Create a Codespace from the repository and run:
 
 ```bash
-uv sync
+uv sync --dev
 ```
 
 Then verify the environment:
 
 ```bash
-python --version
+uv run python --version
 uv run pytest
 uv run ruff check .
 uv run ruff format --check .
