@@ -24,7 +24,6 @@ def load_skdr_periods(dengue_path: str | Path) -> pd.DataFrame:
     dengue = pd.read_csv(dengue_path)
 
     required = set(KEY_COLUMNS)
-
     missing = required.difference(dengue.columns)
 
     if missing:
@@ -35,7 +34,6 @@ def load_skdr_periods(dengue_path: str | Path) -> pd.DataFrame:
 
 def validate_weather_schema(weather_weekly: pd.DataFrame) -> None:
     required = set(KEY_COLUMNS + WEATHER_COLUMNS)
-
     missing = required.difference(weather_weekly.columns)
 
     if missing:
@@ -50,9 +48,7 @@ def align_weather_with_skdr(weather_weekly: pd.DataFrame, dengue_path: str | Pat
     result = periods.merge(
         weather_weekly[KEY_COLUMNS + WEATHER_COLUMNS], on=KEY_COLUMNS, how="left"
     )
-
     result["weather_complete"] = result[WEATHER_COLUMNS].notna().all(axis=1)
-
     result = result.sort_values(KEY_COLUMNS).reset_index(drop=True)
 
     return result

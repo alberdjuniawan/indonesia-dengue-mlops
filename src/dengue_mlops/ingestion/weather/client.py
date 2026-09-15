@@ -36,14 +36,18 @@ class ERA5LandClient:
     def download_timeseries(self, *, start: date, end: date, latitude: float, longitude: float, output_path: str | Path) -> Path:  # fmt: skip
         self._validate_date_range(start, end)
         self._validate_coordinate(latitude, longitude)
+
         output_path = Path(output_path)
         output_path.parent.mkdir(parents=True, exist_ok=True)
+
         request = {
             "variable": TIMESERIES_VARIABLES,
             "location": {"longitude": float(longitude), "latitude": float(latitude)},
             "date": [f"{start.isoformat()}/{end.isoformat()}"],
             "format": "netcdf",
         }
+
         result = self.client.retrieve(TIMESERIES_DATASET, request)
         result.download(output_path)
+
         return output_path
