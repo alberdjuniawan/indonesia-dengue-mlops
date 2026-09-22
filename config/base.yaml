@@ -9,6 +9,13 @@ data:
   week_column: week
   province_column: province
 
+  population:
+    source: bps
+    subject_id: 519
+    domain: "0000"
+    expected_province_count: 38
+    refresh_interval: monthly
+
 model:
   target_horizon: 1
 
