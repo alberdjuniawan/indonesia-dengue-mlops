@@ -22,6 +22,7 @@ dependencies = [
     "pymupdf>=1.28.2",
     "pypdf>=6.17.0",
     "pytesseract>=0.3.13",
+    "python-dotenv>=1.2.3",
     "requests>=2.34.2",
     "shapely>=2.1.2",
     "torch>=2.14.0",
