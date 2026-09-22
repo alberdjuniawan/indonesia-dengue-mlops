@@ -1,7 +1,5 @@
 from unittest.mock import Mock
 
-import httpx
-
 from dengue_mlops.ingestion.population.client import BPSClient
 
 
