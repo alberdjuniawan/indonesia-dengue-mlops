@@ -16,7 +16,7 @@ def load_manifest() -> dict[tuple[int, int], dict]:
         return {}
 
     with MANIFEST_PATH.open("r", newline="", encoding="utf-8") as file:
-        reader = csv.DictWriter(file)
+        reader = csv.DictReader(file)
 
         return {(int(row["year"]), int(row["week"])): row for row in reader}
 
