@@ -1,0 +1,8 @@
+[core]
+    remote = local_storage
+    autostage = true
+['remote "local_storage"']
+    url = /tmp/indonesia_dengue_dvc_storage
+['remote "minio"']
+    url = s3://dengue-data-registry/dvc-storage
+    endpointurl = http://localhost:9000
