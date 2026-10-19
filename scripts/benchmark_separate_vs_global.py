@@ -54,7 +54,9 @@ def run_benchmark() -> None:
     print("=" * 85)
     print("BENCHMARK EKSPERIMEN: GLOBAL POOLED MODEL VS SEPARATE PER-PROVINCE MODELS")
     print("=" * 85)
-    print(f"Dataset Split: Train={len(split.train_x)} | Val={len(split.val_x)} | Test={len(split.test_x)}")
+    print(
+        f"Dataset Split: Train={len(split.train_x)} | Val={len(split.val_x)} | Test={len(split.test_x)}"
+    )
     print(f"Jumlah Provinsi: {len(set(split.provinces_train))} provinsi\n")
 
     # 1. Baseline Lag-1
@@ -105,27 +107,45 @@ def run_benchmark() -> None:
     ]
 
     print("+" + "-" * 38 + "+" + "-" * 22 + "+" + "-" * 22 + "+")
-    print(f"| {'Arsitektur Model':<36} | {'Validation (2025 W27-52)':<20} | {'Test Holdout (2026 W01-12)':<20} |")
+    print(
+        f"| {'Arsitektur Model':<36} | {'Validation (2025 W27-52)':<20} | {'Test Holdout (2026 W01-12)':<20} |"
+    )
     print(f"| {'':<36} | {'MAE':>6} {'RMSE':>7} {'R2':>6} | {'MAE':>6} {'RMSE':>7} {'R2':>6} |")
     print("+" + "-" * 38 + "+" + "-" * 22 + "+" + "-" * 22 + "+")
 
     for name, v, t in results:
-        print(f"| {name:<36} | {v['mae']:>6.2f} {v['rmse']:>7.2f} {v['r2']:>6.4f} | {t['mae']:>6.2f} {t['rmse']:>7.2f} {t['r2']:>6.4f} |")
+        print(
+            f"| {name:<36} | {v['mae']:>6.2f} {v['rmse']:>7.2f} {v['r2']:>6.4f} | {t['mae']:>6.2f} {t['rmse']:>7.2f} {t['r2']:>6.4f} |"
+        )
     print("+" + "-" * 38 + "+" + "-" * 22 + "+" + "-" * 22 + "+")
 
     # Analisis per-provinsi: Global vs Separate
     print("\n--- PERBANDINGAN PER-PROVINSI: GLOBAL ENSEMBLE VS SEPARATE MODELS ---")
-    print(f"{'Provinsi':<22} | {'Aktual Rata2':<12} | {'MAE Global':<12} | {'MAE Separate':<12} | {'Model Terbaik':<15}")
+    print(
+        f"{'Provinsi':<22} | {'Aktual Rata2':<12} | {'MAE Global':<12} | {'MAE Separate':<12} | {'Model Terbaik':<15}"
+    )
     print("-" * 85)
 
     by_prov_test: dict[str, tuple[list[float], list[float], list[float]]] = {}
-    for prov, act, p_glob, p_sep in zip(split.provinces_test, split.test_y, ens_test_preds, sep_test_preds, strict=False):
+    for prov, act, p_glob, p_sep in zip(
+        split.provinces_test, split.test_y, ens_test_preds, sep_test_preds, strict=False
+    ):
         by_prov_test.setdefault(prov, ([], [], []))
         by_prov_test[prov][0].append(act)
         by_prov_test[prov][1].append(p_glob)
         by_prov_test[prov][2].append(p_sep)
 
-    top_provinces = ["JAWA BARAT", "JAWA TIMUR", "JAKARTA", "BALI", "DI YOGYAKARTA", "KALIMANTAN TIMUR", "PAPUA", "MALUKU", "SULAWESI SELATAN"]
+    top_provinces = [
+        "JAWA BARAT",
+        "JAWA TIMUR",
+        "JAKARTA",
+        "BALI",
+        "DI YOGYAKARTA",
+        "KALIMANTAN TIMUR",
+        "PAPUA",
+        "MALUKU",
+        "SULAWESI SELATAN",
+    ]
     for prov in top_provinces:
         if prov in by_prov_test:
             acts, globs, seps = by_prov_test[prov]
@@ -133,7 +153,9 @@ def run_benchmark() -> None:
             mae_g = sum(abs(a - g) for a, g in zip(acts, globs)) / len(acts)
             mae_s = sum(abs(a - s) for a, s in zip(acts, seps)) / len(acts)
             winner = "Separate" if mae_s < mae_g else "Global"
-            print(f"{prov:<22} | {avg_act:>10.1f}   | {mae_g:>10.2f}   | {mae_s:>10.2f}   | {winner:<15}")
+            print(
+                f"{prov:<22} | {avg_act:>10.1f}   | {mae_g:>10.2f}   | {mae_s:>10.2f}   | {winner:<15}"
+            )
 
 
 if __name__ == "__main__":

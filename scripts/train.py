@@ -44,9 +44,7 @@ warnings.filterwarnings("ignore", category=UserWarning, module="mlflow")
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s",
-    datefmt="%H:%M:%S",
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s", datefmt="%H:%M:%S"
 )
 logger = logging.getLogger("mlflow_trainer")
 
@@ -119,7 +117,7 @@ def train_single_run(
     dataset_version: str = "v2.0-data",
 ) -> dict[str, Any]:
     """Train a single model variation and log all artifacts systematically to MLflow."""
-    logger.info(f"\n{'='*75}\nSTARTING MLFLOW RUN: {run_name}\n{'='*75}")
+    logger.info(f"\n{'=' * 75}\nSTARTING MLFLOW RUN: {run_name}\n{'=' * 75}")
     model_name = getattr(model, "name", type(model).__name__)
 
     with mlflow.start_run(run_name=run_name) as run:
@@ -200,10 +198,7 @@ def train_single_run(
 
         wrapper = DengueMLflowWrapper(model=model, feature_names=split.feature_names)
         mlflow.pyfunc.log_model(
-            name="model",
-            python_model=wrapper,
-            signature=signature,
-            input_example=sample_input[:1],
+            name="model", python_model=wrapper, signature=signature, input_example=sample_input[:1]
         )
         logger.info(f"Model logged as PyFunc artifact under run '{run_id}'.")
 
@@ -236,14 +231,14 @@ def train_single_run(
 
 
 def register_champion_to_mlflow(
-    champion_run: dict[str, Any],
-    client: MlflowClient,
-    model_name: str = REGISTERED_MODEL_NAME,
+    champion_run: dict[str, Any], client: MlflowClient, model_name: str = REGISTERED_MODEL_NAME
 ) -> Any:
     """Register the best performing model to the MLflow Model Registry."""
     run_id = champion_run["run_id"]
     model_uri = f"runs:/{run_id}/model"
-    logger.info(f"\nRegistering Champion Run '{run_id}' to MLflow Model Registry as '{model_name}'...")
+    logger.info(
+        f"\nRegistering Champion Run '{run_id}' to MLflow Model Registry as '{model_name}'..."
+    )
 
     # Create registered model if not present
     try:
@@ -272,18 +267,12 @@ def register_champion_to_mlflow(
             f"Test MAE: {champion_run['test_metrics']['mae']:.2f}, "
             f"Test R2: {champion_run['test_metrics']['r2']:.4f}"
         ),
-        tags={
-            "stage": "Champion",
-            "run_name": champion_run["run_name"],
-            "version_tag": "1.0.0",
-        },
+        tags={"stage": "Champion", "run_name": champion_run["run_name"], "version_tag": "1.0.0"},
     )
 
     # Set alias / tag
     client.set_registered_model_alias(
-        name=model_name,
-        alias="champion",
-        version=model_version.version,
+        name=model_name, alias="champion", version=model_version.version
     )
     logger.info(
         f"Model Version v{model_version.version} promoted to alias '@champion' in Model Registry!"
@@ -448,9 +437,7 @@ def run_experiment_suite(
         },
         {
             "run_name": "run_06_pytorch_temporal_mlp",
-            "model": PyTorchTemporalRegressor(
-                hidden_dim=64, lr=0.005, epochs=150, device=device
-            ),
+            "model": PyTorchTemporalRegressor(hidden_dim=64, lr=0.005, epochs=150, device=device),
             "params": {
                 "model_type": "pytorch_mlp",
                 "hidden_dim": 64,
@@ -564,10 +551,7 @@ def parse_args() -> argparse.Namespace:
         help="Hardware acceleration mode",
     )
     parser.add_argument(
-        "--version",
-        type=str,
-        default="1.0.0",
-        help="Semantic model version (default: 1.0.0)",
+        "--version", type=str, default="1.0.0", help="Semantic model version (default: 1.0.0)"
     )
     return parser.parse_args()
 
@@ -609,10 +593,7 @@ def main() -> None:
             params = {"model_type": "pytorch", "lr": args.lr, "epochs": args.epochs}
 
         res = train_single_run(
-            model=model,
-            run_name=f"custom_{args.model_type}_run",
-            split=split,
-            params=params,
+            model=model, run_name=f"custom_{args.model_type}_run", split=split, params=params
         )
         print(f"\nSingle run complete: {res['run_id']}")
 

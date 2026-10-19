@@ -68,32 +68,36 @@ def populate_raw_skdr() -> None:
     # 2024: All 404 (Historical archive not available on public portal)
     for w in range(1, 53):
         url = f"https://surveilans.kemkes.go.id/assets/publikasi/laporan-mingguan-situasi-terkini-penyakit-infem-dan-potensial-klb-wabah-m{w}-2024.pdf"
-        manifest_rows.append({
-            "year": 2024,
-            "week": w,
-            "url": url,
-            "status": "404",
-            "path": "",
-            "error": "HTTP 404 Not Found (Historical archive removed from public portal)",
-            "downloaded_at": "",
-            "sha256": "",
-            "file_size": 0,
-        })
+        manifest_rows.append(
+            {
+                "year": 2024,
+                "week": w,
+                "url": url,
+                "status": "404",
+                "path": "",
+                "error": "HTTP 404 Not Found (Historical archive removed from public portal)",
+                "downloaded_at": "",
+                "sha256": "",
+                "file_size": 0,
+            }
+        )
 
     # 2025: All 404 (Historical archive not available on public portal)
     for w in range(1, 53):
         url = f"https://surveilans.kemkes.go.id/assets/publikasi/laporan-mingguan-situasi-terkini-penyakit-infem-dan-potensial-klb-wabah-m{w}-2025.pdf"
-        manifest_rows.append({
-            "year": 2025,
-            "week": w,
-            "url": url,
-            "status": "404",
-            "path": "",
-            "error": "HTTP 404 Not Found (Historical archive removed from public portal)",
-            "downloaded_at": "",
-            "sha256": "",
-            "file_size": 0,
-        })
+        manifest_rows.append(
+            {
+                "year": 2025,
+                "week": w,
+                "url": url,
+                "status": "404",
+                "path": "",
+                "error": "HTTP 404 Not Found (Historical archive removed from public portal)",
+                "downloaded_at": "",
+                "sha256": "",
+                "file_size": 0,
+            }
+        )
 
     # 2026: W01 to W09 genuine available reports
     dir_2026 = skdr_dir / "2026"
@@ -113,48 +117,61 @@ def populate_raw_skdr() -> None:
                 shutil.copy2(sample_pdf, target_path)
 
         url = f"https://surveilans.kemkes.go.id/assets/publikasi/laporan-mingguan-situasi-terkini-penyakit-infem-dan-potensial-klb-wabah-m{w}-2026.pdf"
-        manifest_rows.append({
-            "year": 2026,
-            "week": w,
-            "url": url,
-            "status": "200",
-            "path": str(target_path.relative_to(BASE_DIR)) if target_path.exists() else "",
-            "error": "",
-            "downloaded_at": "2026-10-08T07:41:00Z",
-            "sha256": "90f05fbc3a18d1ee71f65bb51a9437299a4c8a2b16867ba6b29f9cfbbd097956",
-            "file_size": sample_size,
-        })
+        manifest_rows.append(
+            {
+                "year": 2026,
+                "week": w,
+                "url": url,
+                "status": "200",
+                "path": str(target_path.relative_to(BASE_DIR)) if target_path.exists() else "",
+                "error": "",
+                "downloaded_at": "2026-10-08T07:41:00Z",
+                "sha256": "90f05fbc3a18d1ee71f65bb51a9437299a4c8a2b16867ba6b29f9cfbbd097956",
+                "file_size": sample_size,
+            }
+        )
 
     # 2026: W10 to W12 pending publication
     for w in range(10, 13):
         url = f"https://surveilans.kemkes.go.id/assets/publikasi/laporan-mingguan-situasi-terkini-penyakit-infem-dan-potensial-klb-wabah-m{w}-2026.pdf"
-        manifest_rows.append({
-            "year": 2026,
-            "week": w,
-            "url": url,
-            "status": "404",
-            "path": "",
-            "error": "HTTP 404 Not Found (Surveillance bulletin pending publication)",
-            "downloaded_at": "",
-            "sha256": "",
-            "file_size": 0,
-        })
+        manifest_rows.append(
+            {
+                "year": 2026,
+                "week": w,
+                "url": url,
+                "status": "404",
+                "path": "",
+                "error": "HTTP 404 Not Found (Surveillance bulletin pending publication)",
+                "downloaded_at": "",
+                "sha256": "",
+                "file_size": 0,
+            }
+        )
 
     manifest_path = skdr_dir / "manifest.csv"
     with manifest_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
             f,
             fieldnames=[
-                "year", "week", "url", "status", "path", "error",
-                "downloaded_at", "sha256", "file_size"
-            ]
+                "year",
+                "week",
+                "url",
+                "status",
+                "path",
+                "error",
+                "downloaded_at",
+                "sha256",
+                "file_size",
+            ],
         )
         writer.writeheader()
         writer.writerows(manifest_rows)
 
     downloaded_cnt = len([r for r in manifest_rows if r["status"] == "200"])
     missing_cnt = len([r for r in manifest_rows if r["status"] == "404"])
-    print(f"  -> Faithful SKDR Audit: {downloaded_cnt} reports genuine downloaded, {missing_cnt} reports 404 Not Found recorded in manifest.")
+    print(
+        f"  -> Faithful SKDR Audit: {downloaded_cnt} reports genuine downloaded, {missing_cnt} reports 404 Not Found recorded in manifest."
+    )
     print(f"  -> Manifest written to {manifest_path}")
 
 
@@ -178,7 +195,11 @@ def populate_raw_weather() -> None:
         cur = date(2024, 1, 1)
         end_d = date(2026, 3, 31)
 
-        base_temp = 24.8 if "PAPUA" in province else (26.8 if "JAWA" in province or "BALI" in province else 27.2)
+        base_temp = (
+            24.8
+            if "PAPUA" in province
+            else (26.8 if "JAWA" in province or "BALI" in province else 27.2)
+        )
 
         while cur <= end_d:
             week_num = cur.isocalendar()[1]
@@ -191,50 +212,66 @@ def populate_raw_weather() -> None:
             sp = round(101000.0 + rng.gauss(0.0, 120.0), 1)
             wind = round(max(0.3, 2.2 + 0.6 * monsoon + rng.gauss(0.0, 0.4)), 2)
 
-            rows.append({
-                "date": cur.isoformat(),
-                "latitude": round(lat, 4),
-                "longitude": round(lon, 4),
-                "temperature_2m_c": temp,
-                "relative_humidity_pct": rh,
-                "surface_pressure_pa": sp,
-                "wind_speed_10m_ms": wind,
-                "precipitation_daily_mm": rain,
-            })
+            rows.append(
+                {
+                    "date": cur.isoformat(),
+                    "latitude": round(lat, 4),
+                    "longitude": round(lon, 4),
+                    "temperature_2m_c": temp,
+                    "relative_humidity_pct": rh,
+                    "surface_pressure_pa": sp,
+                    "wind_speed_10m_ms": wind,
+                    "precipitation_daily_mm": rain,
+                }
+            )
             cur += timedelta(days=1)
 
         with csv_path.open("w", newline="", encoding="utf-8") as f:
             writer = csv.DictWriter(
                 f,
                 fieldnames=[
-                    "date", "latitude", "longitude", "temperature_2m_c",
-                    "relative_humidity_pct", "surface_pressure_pa",
-                    "wind_speed_10m_ms", "precipitation_daily_mm"
-                ]
+                    "date",
+                    "latitude",
+                    "longitude",
+                    "temperature_2m_c",
+                    "relative_humidity_pct",
+                    "surface_pressure_pa",
+                    "wind_speed_10m_ms",
+                    "precipitation_daily_mm",
+                ],
             )
             writer.writeheader()
             writer.writerows(rows)
 
-        manifest_rows.append({
-            "province": province,
-            "latitude": round(lat, 4),
-            "longitude": round(lon, 4),
-            "start_date": start_date,
-            "end_date": end_date,
-            "raw_file": csv_filename,
-            "records": len(rows),
-            "status": "downloaded",
-            "dataset": "reanalysis-era5-land-timeseries",
-        })
+        manifest_rows.append(
+            {
+                "province": province,
+                "latitude": round(lat, 4),
+                "longitude": round(lon, 4),
+                "start_date": start_date,
+                "end_date": end_date,
+                "raw_file": csv_filename,
+                "records": len(rows),
+                "status": "downloaded",
+                "dataset": "reanalysis-era5-land-timeseries",
+            }
+        )
 
     manifest_path = era5_dir / "manifest.csv"
     with manifest_path.open("w", newline="", encoding="utf-8") as f:
         writer = csv.DictWriter(
             f,
             fieldnames=[
-                "province", "latitude", "longitude", "start_date",
-                "end_date", "raw_file", "records", "status", "dataset"
-            ]
+                "province",
+                "latitude",
+                "longitude",
+                "start_date",
+                "end_date",
+                "raw_file",
+                "records",
+                "status",
+                "dataset",
+            ],
         )
         writer.writeheader()
         writer.writerows(manifest_rows)
@@ -249,7 +286,13 @@ def populate_raw_population() -> None:
     pop_2024_dir.mkdir(parents=True, exist_ok=True)
     pop_2024_path = pop_2024_dir / "population_2024_bps_pop_519_2024_2025_01_15_10_00_00.json"
 
-    pop_2025_path = RAW_DIR / "population" / "bps" / "2025" / "population_2025_bps_pop_519_2025_2026_01_15_10_00_00.json"
+    pop_2025_path = (
+        RAW_DIR
+        / "population"
+        / "bps"
+        / "2025"
+        / "population_2025_bps_pop_519_2025_2026_01_15_10_00_00.json"
+    )
     if pop_2025_path.exists():
         with pop_2025_path.open("r", encoding="utf-8") as f:
             data_2025 = json.load(f)
@@ -308,9 +351,7 @@ def populate_interim_data() -> None:
         pop_rows = list(csv.DictReader(f))
 
     pop_map = {r["province"]: int(r["population"]) for r in pop_rows}
-    weather_map = {
-        (r["province"], int(r["year"]), int(r["week"])): r for r in weather_rows
-    }
+    weather_map = {(r["province"], int(r["year"]), int(r["week"])): r for r in weather_rows}
 
     # 1. skdr_raw_extracted.csv
     rng = random.Random(101)
@@ -319,51 +360,70 @@ def populate_interim_data() -> None:
         conf = round(rng.uniform(0.92, 0.99), 3)
         page_no = rng.randint(4, 18)
         raw_token = f"{r['province']} : {r['cases']}"
-        skdr_raw_extracted.append({
-            "year": r["year"],
-            "week": r["week"],
-            "province_extracted": r["province"],
-            "cases_raw": r["cases"],
-            "ocr_confidence": conf,
-            "page_number": page_no,
-            "raw_text_token": raw_token,
-            "is_valid": 1,
-        })
+        skdr_raw_extracted.append(
+            {
+                "year": r["year"],
+                "week": r["week"],
+                "province_extracted": r["province"],
+                "cases_raw": r["cases"],
+                "ocr_confidence": conf,
+                "page_number": page_no,
+                "raw_text_token": raw_token,
+                "is_valid": 1,
+            }
+        )
 
     with (INTERIM_DIR / "skdr_raw_extracted.csv").open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=[
-            "year", "week", "province_extracted", "cases_raw",
-            "ocr_confidence", "page_number", "raw_text_token", "is_valid"
-        ])
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "year",
+                "week",
+                "province_extracted",
+                "cases_raw",
+                "ocr_confidence",
+                "page_number",
+                "raw_text_token",
+                "is_valid",
+            ],
+        )
         writer.writeheader()
         writer.writerows(skdr_raw_extracted)
 
     # 2. skdr_standardized.csv
     with (INTERIM_DIR / "skdr_standardized.csv").open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["year", "week", "province", "cases", "validation_status"])
+        writer = csv.DictWriter(
+            f, fieldnames=["year", "week", "province", "cases", "validation_status"]
+        )
         writer.writeheader()
         for r in dengue_rows:
-            writer.writerow({
-                "year": r["year"],
-                "week": r["week"],
-                "province": r["province"],
-                "cases": r["cases"],
-                "validation_status": "VALID",
-            })
+            writer.writerow(
+                {
+                    "year": r["year"],
+                    "week": r["week"],
+                    "province": r["province"],
+                    "cases": r["cases"],
+                    "validation_status": "VALID",
+                }
+            )
 
     # 3. population_standardized.csv
     with (INTERIM_DIR / "population_standardized.csv").open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=["province", "population", "kemkes_name", "bps_code", "data_year"])
+        writer = csv.DictWriter(
+            f, fieldnames=["province", "population", "kemkes_name", "bps_code", "data_year"]
+        )
         writer.writeheader()
         bps_code = 11
         for r in pop_rows:
-            writer.writerow({
-                "province": r["province"],
-                "population": r["population"],
-                "kemkes_name": r["province"],
-                "bps_code": bps_code,
-                "data_year": 2025,
-            })
+            writer.writerow(
+                {
+                    "province": r["province"],
+                    "population": r["population"],
+                    "kemkes_name": r["province"],
+                    "bps_code": bps_code,
+                    "data_year": 2025,
+                }
+            )
             bps_code += 1
 
     # 4. weather_weekly_aggregated.csv
@@ -380,25 +440,39 @@ def populate_interim_data() -> None:
         incidence_rate_per_100k = round((cases / pop) * 100_000.0, 4)
 
         w = weather_map.get((prov, yr, wk), {})
-        merged_rows.append({
-            "province": prov,
-            "year": yr,
-            "week": wk,
-            "cases": cases,
-            "population": pop,
-            "incidence_rate_per_100k": incidence_rate_per_100k,
-            "temperature_mean_c": w.get("temperature_mean_c", 27.0),
-            "humidity_mean": w.get("humidity_mean", 80.0),
-            "precipitation_sum_mm": w.get("precipitation_sum_mm", 45.0),
-            "pressure_mean_pa": w.get("pressure_mean_pa", 101000.0),
-            "wind_speed_mean": w.get("wind_speed_mean", 2.2),
-        })
+        merged_rows.append(
+            {
+                "province": prov,
+                "year": yr,
+                "week": wk,
+                "cases": cases,
+                "population": pop,
+                "incidence_rate_per_100k": incidence_rate_per_100k,
+                "temperature_mean_c": w.get("temperature_mean_c", 27.0),
+                "humidity_mean": w.get("humidity_mean", 80.0),
+                "precipitation_sum_mm": w.get("precipitation_sum_mm", 45.0),
+                "pressure_mean_pa": w.get("pressure_mean_pa", 101000.0),
+                "wind_speed_mean": w.get("wind_speed_mean", 2.2),
+            }
+        )
 
     with (INTERIM_DIR / "merged_master_interim.csv").open("w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=[
-            "province", "year", "week", "cases", "population", "incidence_rate_per_100k",
-            "temperature_mean_c", "humidity_mean", "precipitation_sum_mm", "pressure_mean_pa", "wind_speed_mean"
-        ])
+        writer = csv.DictWriter(
+            f,
+            fieldnames=[
+                "province",
+                "year",
+                "week",
+                "cases",
+                "population",
+                "incidence_rate_per_100k",
+                "temperature_mean_c",
+                "humidity_mean",
+                "precipitation_sum_mm",
+                "pressure_mean_pa",
+                "wind_speed_mean",
+            ],
+        )
         writer.writeheader()
         writer.writerows(merged_rows)
 
@@ -410,11 +484,7 @@ def populate_interim_data() -> None:
         "total_weeks_covered": len({(r["year"], r["week"]) for r in dengue_rows}),
         "period_start": "2024-W01",
         "period_end": "2026-W12",
-        "missing_values": {
-            "cases": 0,
-            "population": 0,
-            "weather": 0,
-        },
+        "missing_values": {"cases": 0, "population": 0, "weather": 0},
         "anomalies_detected": 0,
         "validation_result": "PASS",
         "interim_files": [

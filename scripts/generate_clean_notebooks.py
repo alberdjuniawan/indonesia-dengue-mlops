@@ -4,31 +4,25 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 NOTEBOOKS_DIR = BASE_DIR / "notebooks"
 
+
 def make_md_cell(text: str) -> dict:
     lines = [line + "\n" for line in text.split("\n")]
     if lines and lines[-1] == "\n":
         lines[-1] = ""
-    return {
-        "cell_type": "markdown",
-        "metadata": {},
-        "source": lines,
-    }
+    return {"cell_type": "markdown", "metadata": {}, "source": lines}
+
 
 def make_code_cell(code: str, output_text: str | None = None, exec_count: int = 1) -> dict:
     code_lines = [line + "\n" for line in code.split("\n")]
     if code_lines and code_lines[-1] == "\n":
         code_lines[-1] = ""
-    
+
     outputs = []
     if output_text:
         out_lines = [line + "\n" for line in output_text.split("\n")]
         if out_lines and out_lines[-1] == "\n":
             out_lines[-1] = ""
-        outputs.append({
-            "name": "stdout",
-            "output_type": "stream",
-            "text": out_lines,
-        })
+        outputs.append({"name": "stdout", "output_type": "stream", "text": out_lines})
 
     return {
         "cell_type": "code",
@@ -37,6 +31,7 @@ def make_code_cell(code: str, output_text: str | None = None, exec_count: int = 
         "outputs": outputs,
         "source": code_lines,
     }
+
 
 def save_notebook(cells: list[dict], output_path: Path) -> None:
     nb = {
@@ -65,6 +60,7 @@ def save_notebook(cells: list[dict], output_path: Path) -> None:
         json.dump(nb, f, indent=1, ensure_ascii=False)
     print(f"Saved: {output_path}")
 
+
 # --- Notebook 0: Ingestion Experiments ---
 def build_ingestion_experiments():
     cells = [
@@ -86,7 +82,7 @@ def build_ingestion_experiments():
             "    doc = pymupdf.open(sample_pdf)\n"
             "    print(f'Total pages in document: {len(doc)}')",
             "Sample PDF exists: True\nTotal pages in document: 18",
-            exec_count=1
+            exec_count=1,
         ),
         make_md_cell(
             "## 1. Page Discovery: Keyword Matching vs Exhaustive Scan\n\n"
@@ -105,8 +101,8 @@ def build_ingestion_experiments():
             "            matched_pages.append(page_num)\n\n"
             "print(f'Keyword: \"{keyword}\"')\n"
             "print(f'Found on page(s): {matched_pages}')",
-            "Keyword: \"Kasus Suspek Dengue Berdasarkan Provinsi\"\nFound on page(s): [6]",
-            exec_count=2
+            'Keyword: "Kasus Suspek Dengue Berdasarkan Provinsi"\nFound on page(s): [6]',
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Trial 1: Direct Text Layer Extraction & Limitations\n\n"
@@ -134,7 +130,7 @@ def build_ingestion_experiments():
             "  1\n"
             "  ACEH\n"
             "  SUMATERA UTARA",
-            exec_count=3
+            exec_count=3,
         ),
         make_md_cell(
             "## 3. Trial 2: Naive Full-Page OCR & Noise Analysis\n\n"
@@ -158,15 +154,15 @@ def build_ingestion_experiments():
             "    print(f'  score={score:.2f} | text=\"{text}\"')\n\n"
             "print('\\nObservation: Layout isolation is required before character recognition.')",
             "Detected elements: 7\n"
-            "  score=0.96 | text=\"Lampiran 4. Situasi Penyakit Potensial KLB\"\n"
-            "  score=0.94 | text=\"Kasus Suspek Dengue Berdasarkan Provinsi\"\n"
-            "  score=0.92 | text=\"JAWA BARAT\"\n"
-            "  score=0.89 | text=\"682\"\n"
-            "  score=0.85 | text=\"Grafik 3. Tren Mingguan Kasus DBD 2024-2025\"\n"
-            "  score=0.90 | text=\"Sumber data: Ditjen P2P Kemenkes RI\"\n"
-            "  score=0.97 | text=\"Halaman 6 dari 18\"\n\n"
+            '  score=0.96 | text="Lampiran 4. Situasi Penyakit Potensial KLB"\n'
+            '  score=0.94 | text="Kasus Suspek Dengue Berdasarkan Provinsi"\n'
+            '  score=0.92 | text="JAWA BARAT"\n'
+            '  score=0.89 | text="682"\n'
+            '  score=0.85 | text="Grafik 3. Tren Mingguan Kasus DBD 2024-2025"\n'
+            '  score=0.90 | text="Sumber data: Ditjen P2P Kemenkes RI"\n'
+            '  score=0.97 | text="Halaman 6 dari 18"\n\n'
             "Observation: Layout isolation is required before character recognition.",
-            exec_count=4
+            exec_count=4,
         ),
         make_md_cell(
             "## 4. Trial 3: Layout Detection & Chart Bounding Box Isolation\n\n"
@@ -189,7 +185,7 @@ def build_ingestion_experiments():
             "print(f'Crop resolution: {height}x{width} pixels at scale {RENDER_SCALE}x')",
             "Isolated table box: [150, 45, 950, 780]\n"
             "Crop resolution: 800x735 pixels at scale 2.0x",
-            exec_count=5
+            exec_count=5,
         ),
         make_md_cell(
             "## 5. Trial 4: Image Preprocessing (Dilation, Thresholding) & Separate Recognition\n\n"
@@ -211,7 +207,7 @@ def build_ingestion_experiments():
             "  Binarize threshold : 40\n"
             "  Morphology kernel  : (2, 2)\n"
             "  Iterations         : 1",
-            exec_count=6
+            exec_count=6,
         ),
         make_md_cell(
             "## 6. Province Matching with Trigram Fuzzy Similarity\n\n"
@@ -239,7 +235,7 @@ def build_ingestion_experiments():
             "for raw, target in samples:\n"
             "    score = trigram_sim(raw, target)\n"
             "    accepted = score >= 0.50 or raw in target or target in raw\n"
-            "    print(f\"{raw:<18} | {target:<18} | {score:>5.2f}  | {str(accepted):<8}\")",
+            '    print(f"{raw:<18} | {target:<18} | {score:>5.2f}  | {str(accepted):<8}")',
             "Raw OCR            | Canonical Target   | Score  | Accepted\n"
             "------------------------------------------------------------\n"
             "JAWA BARAT         | JAWA BARAT         |  1.00  | True    \n"
@@ -247,7 +243,7 @@ def build_ingestion_experiments():
             "DKI JAKARTA        | JAKARTA            |  0.71  | True    \n"
             "PAPUA B. DAYA      | PAPUA BARAT DAYA   |  0.53  | True    \n"
             "MALUKU UTR         | MALUKU UTARA       |  0.73  | True    ",
-            exec_count=7
+            exec_count=7,
         ),
         make_md_cell(
             "## 7. Pipeline Output & Validation Check\n\n"
@@ -274,10 +270,11 @@ def build_ingestion_experiments():
             " 2024     1 SUMATERA SELATAN   52\n"
             " 2024     1       BENGKULU     14\n"
             " 2024     1        LAMPUNG     63",
-            exec_count=8
+            exec_count=8,
         ),
     ]
     save_notebook(cells, NOTEBOOKS_DIR / "experiments" / "01_skdr_ingestion_experiments.ipynb")
+
 
 # --- Notebook 1: EDA ---
 def build_eda_notebook():
@@ -298,11 +295,9 @@ def build_eda_notebook():
             "print(f'weather_weekly.csv exists: {weather_path.exists()}')\n"
             "print(f'population.csv exists: {pop_path.exists()}')",
             "dengue.csv exists: True\nweather_weekly.csv exists: True\npopulation.csv exists: True",
-            exec_count=1
+            exec_count=1,
         ),
-        make_md_cell(
-            "## 1. Load Datasets & Summary Statistics"
-        ),
+        make_md_cell("## 1. Load Datasets & Summary Statistics"),
         make_code_cell(
             "df_dengue = pd.read_csv(dengue_path)\n"
             "df_pop = pd.read_csv(pop_path)\n\n"
@@ -316,7 +311,7 @@ def build_eda_notebook():
             "Years covered                  : [2024, 2025, 2026]\n"
             "Total reported dengue cases    : 368,245\n"
             "Mean weekly cases per province : 83.5",
-            exec_count=2
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Province Incidence Distribution\n\n"
@@ -346,7 +341,7 @@ def build_eda_notebook():
             "            MALUKU   1750     1911900           91.53\n"
             "PAPUA PEGUNUNGAN   1210     1449000           83.51\n"
             "  PAPUA BARAT DAYA   1180      621000          190.02",
-            exec_count=3
+            exec_count=3,
         ),
         make_md_cell(
             "## 3. Seasonal Profile (Monsoon Dynamics)\n\n"
@@ -362,7 +357,7 @@ def build_eda_notebook():
             "for w in sample_weeks:\n"
             "    val = weekly_mean.get(w, 0.0)\n"
             "    phase = 'Peak Monsoon' if 8 <= w <= 16 else ('Dry Season' if 24 <= w <= 36 else 'Transition')\n"
-            "    print(f\"W{w:02d}     | {val:>8.1f}     | {phase:<18}\")",
+            '    print(f"W{w:02d}     | {val:>8.1f}     | {phase:<18}")',
             "Week     | Mean Cases   | Seasonal Phase    \n"
             "--------------------------------------------\n"
             "W04      |     78.4     | Transition        \n"
@@ -374,7 +369,7 @@ def build_eda_notebook():
             "W40      |     59.8     | Transition        \n"
             "W48      |     72.4     | Transition        \n"
             "W52      |     81.0     | Transition        ",
-            exec_count=4
+            exec_count=4,
         ),
         make_md_cell(
             "## 4. Climate Interactions (ERA5-Land)\n\n"
@@ -400,10 +395,11 @@ def build_eda_notebook():
             "  temperature_mean_c     : r = +0.1845\n"
             "  humidity_mean          : r = +0.2781\n"
             "  wind_speed_mean        : r = -0.1105",
-            exec_count=5
+            exec_count=5,
         ),
     ]
     save_notebook(cells, NOTEBOOKS_DIR / "eda" / "01_exploratory_data_analysis.ipynb")
+
 
 # --- Notebook 2: Preprocessing and Interim ---
 def build_preprocessing_notebook():
@@ -421,7 +417,7 @@ def build_preprocessing_notebook():
             "df_manifest = pd.read_csv(MANIFEST_PATH)\n"
             "print(f'Total audited weeks: {len(df_manifest)}')",
             "Manifest exists: True\nTotal audited weeks: 104",
-            exec_count=1
+            exec_count=1,
         ),
         make_md_cell(
             "## 1. Raw Surveillance Gap Audit\n\n"
@@ -443,7 +439,7 @@ def build_preprocessing_notebook():
             "      not_found         21\n\n"
             "Total available PDF bulletins : 58\n"
             "Total missing bulletins (404) : 46",
-            exec_count=2
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Preprocessing & Interim Time-Series Continuity\n\n"
@@ -457,7 +453,7 @@ def build_preprocessing_notebook():
             "jb = df_dengue[df_dengue['province'] == 'JAWA BARAT'].sort_values(by=['year', 'week'])\n"
             "print(f'Jawa Barat recorded weeks: {len(jb)}')\n"
             "print(f'Mean weekly cases: {jb[\"cases\"].mean():.1f}')\n"
-            "print(f'Min cases: {jb[\"cases\"].min()} | Max cases: {jb[\"cases\"].max()}')\n\n"
+            'print(f\'Min cases: {jb["cases"].min()} | Max cases: {jb["cases"].max()}\')\n\n'
             "print('Sample consecutive weeks (Jawa Barat):')\n"
             "print(jb.head(8)[['year', 'week', 'cases']].to_string(index=False))",
             "Jawa Barat recorded weeks: 116\n"
@@ -473,7 +469,7 @@ def build_preprocessing_notebook():
             " 2024     6    710\n"
             " 2024     7    780\n"
             " 2024     8    890",
-            exec_count=3
+            exec_count=3,
         ),
         make_md_cell(
             "## 3. Interim Quality Audit\n\n"
@@ -488,10 +484,11 @@ def build_preprocessing_notebook():
             "Provinces with full records : 38 of 38\n"
             "Null case count values      : 0\n"
             "Negative case count values  : 0",
-            exec_count=4
+            exec_count=4,
         ),
     ]
     save_notebook(cells, NOTEBOOKS_DIR / "experiments" / "02_data_preprocessing_and_interim.ipynb")
+
 
 # --- Notebook 3: Feature Engineering ---
 def build_feature_engineering_notebook():
@@ -510,7 +507,7 @@ def build_feature_engineering_notebook():
             "df_features = pd.read_csv(features_path)\n"
             "print(f'Shape: {df_features.shape[0]:,} rows x {df_features.shape[1]} columns')",
             "features.csv exists: True\nShape: 4,218 rows x 24 columns",
-            exec_count=1
+            exec_count=1,
         ),
         make_md_cell(
             "## 1. Feature Columns Overview\n\n"
@@ -546,7 +543,7 @@ def build_feature_engineering_notebook():
             "  - wind_speed_mean\n"
             "  - is_imputed\n"
             "  - target",
-            exec_count=2
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Cyclical Week Encoding\n\n"
@@ -566,11 +563,9 @@ def build_feature_engineering_notebook():
             "   10  0.935016  0.354605\n"
             "   11  0.970942  0.239316\n"
             "   12  0.992709  0.120537",
-            exec_count=3
+            exec_count=3,
         ),
-        make_md_cell(
-            "## 3. Correlation with Target Variable"
-        ),
+        make_md_cell("## 3. Correlation with Target Variable"),
         make_code_cell(
             "# feature correlations\n"
             "num_cols = df_features.select_dtypes(include=[np.number]).columns\n"
@@ -588,10 +583,11 @@ def build_feature_engineering_notebook():
             "population                      0.781240\n"
             "precipitation_rolling_mean_4    0.342115\n"
             "precipitation_sum_mm            0.312450",
-            exec_count=4
+            exec_count=4,
         ),
     ]
     save_notebook(cells, NOTEBOOKS_DIR / "experiments" / "03_feature_engineering_pipeline.ipynb")
+
 
 # --- Notebook 4: Modeling & GPU Benchmark ---
 def build_modeling_notebook():
@@ -621,7 +617,7 @@ def build_modeling_notebook():
             "print(f'Test samples  : {len(split.test_x):,}')\n"
             "print(f'Provinces     : {len(set(split.provinces_train))}')",
             "Train samples : 1,824\nVal samples   : 988\nTest samples  : 1,406\nProvinces     : 38",
-            exec_count=1
+            exec_count=1,
         ),
         make_md_cell(
             "## 1. Train Model Architectures\n\n"
@@ -673,7 +669,7 @@ def build_modeling_notebook():
             "Global Ensemble (Champion)     |   13.75 |   29.15 |   0.9658\n"
             "Separate Models (38 Local)     |   14.50 |   32.13 |   0.9585\n"
             "PyTorch Deep Neural Net        |   15.69 |   31.35 |   0.9605",
-            exec_count=2
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Province-by-Province Breakdown: Global vs Separate Models\n\n"
@@ -701,7 +697,7 @@ def build_modeling_notebook():
             "    mae_g = sum(abs(a - g) for a, g in zip(acts, globs)) / len(acts)\n"
             "    mae_s = sum(abs(a - s) for a, s in zip(acts, seps)) / len(acts)\n"
             "    best = 'Separate' if mae_s < mae_g else 'Global'\n"
-            "    print(f\"{p:<20} | {avg_a:>12.1f} | {mae_g:>11.2f} | {mae_s:>13.2f} | {best:<12}\")",
+            '    print(f"{p:<20} | {avg_a:>12.1f} | {mae_g:>11.2f} | {mae_s:>13.2f} | {best:<12}")',
             "Province             |  Mean Actual |  Global MAE |  Separate MAE | Best Model  \n"
             "----------------------------------------------------------------------------\n"
             "JAWA BARAT           |        663.1 |       85.86 |         87.99 | Global      \n"
@@ -712,11 +708,10 @@ def build_modeling_notebook():
             "KALIMANTAN TIMUR     |         84.2 |       10.57 |         12.15 | Global      \n"
             "PAPUA                |         18.4 |        7.29 |          3.31 | Separate    \n"
             "MALUKU               |         16.1 |        6.03 |          2.11 | Separate    ",
-            exec_count=3
+            exec_count=3,
         ),
         make_md_cell(
-            "## 3. Model Registry Export\n\n"
-            "Save the winning model to models/champion.json."
+            "## 3. Model Registry Export\n\nSave the winning model to models/champion.json."
         ),
         make_code_cell(
             "from dengue_mlops.modeling.registry import register_champion\n\n"
@@ -729,10 +724,13 @@ def build_modeling_notebook():
             ")\n"
             "print(f'Champion registered to: {reg_path}')",
             "Champion registered to: models/champion.json",
-            exec_count=4
+            exec_count=4,
         ),
     ]
-    save_notebook(cells, NOTEBOOKS_DIR / "experiments" / "04_model_training_and_gpu_benchmarks.ipynb")
+    save_notebook(
+        cells, NOTEBOOKS_DIR / "experiments" / "04_model_training_and_gpu_benchmarks.ipynb"
+    )
+
 
 if __name__ == "__main__":
     build_ingestion_experiments()

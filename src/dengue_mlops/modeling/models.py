@@ -188,11 +188,7 @@ class PyTorchTemporalRegressor(BaseModel):
     """Deep Neural Network / Temporal Regressor with CUDA GPU acceleration."""
 
     def __init__(
-        self,
-        hidden_dim: int = 64,
-        lr: float = 0.005,
-        epochs: int = 150,
-        device: str = "auto",
+        self, hidden_dim: int = 64, lr: float = 0.005, epochs: int = 150, device: str = "auto"
     ) -> None:
         self.hidden_dim = hidden_dim
         self.lr = lr
@@ -317,7 +313,9 @@ class PyTorchTemporalRegressor(BaseModel):
             loss = sum(e**2 for e in errors) / (2 * n)
             self.history_loss.append(round(loss, 4))
             grad_b = sum(errors) / n
-            grad_w = [sum(errors[i] * norm_X[i][j] for i in range(n)) / n for j in range(num_features)]
+            grad_w = [
+                sum(errors[i] * norm_X[i][j] for i in range(n)) / n for j in range(num_features)
+            ]
             self.bias -= self.lr * grad_b
             for j in range(num_features):
                 self.weights[j] -= self.lr * grad_w[j]
@@ -423,9 +421,7 @@ class SeparateProvinceModels(BaseModel):
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> SeparateProvinceModels:
         model = cls(
-            alpha=data.get("alpha", 0.5),
-            lr=data.get("lr", 0.005),
-            epochs=data.get("epochs", 400),
+            alpha=data.get("alpha", 0.5), lr=data.get("lr", 0.005), epochs=data.get("epochs", 400)
         )
         for k, v in data.get("province_models", {}).items():
             model.province_models[k] = RidgeRegressionModel.from_dict(v)

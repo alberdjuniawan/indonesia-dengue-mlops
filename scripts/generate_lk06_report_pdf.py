@@ -227,7 +227,9 @@ def build_pdf_report(output_path: Path) -> None:
         )
     )
 
-    story.append(Paragraph("3. Integrasi Kode Inti: Skrip `scripts/train.py` Terintegrasi MLflow", h1_style))
+    story.append(
+        Paragraph("3. Integrasi Kode Inti: Skrip `scripts/train.py` Terintegrasi MLflow", h1_style)
+    )
     story.append(
         Paragraph(
             "Skrip <code>scripts/train.py</code> dirancang modular dan mematuhi prinsip <i>clean code</i> serta <i>strict typing</i>. "
@@ -237,7 +239,11 @@ def build_pdf_report(output_path: Path) -> None:
     )
 
     code_snippet_table = [
-        [Paragraph("<b>Potongan Implementasi Kunci Integrasi MLflow (scripts/train.py)</b>", th_style)],
+        [
+            Paragraph(
+                "<b>Potongan Implementasi Kunci Integrasi MLflow (scripts/train.py)</b>", th_style
+            )
+        ],
         [
             Paragraph(
                 """<font color='#38BDF8'># 1. Konfigurasi Backend SQLite & Eksperimen</font><br/>
@@ -366,7 +372,19 @@ def build_pdf_report(output_path: Path) -> None:
             Paragraph("<font color='#0284C7'>Candidate</font>", td_style),
         ],
     ]
-    t_exp = Table(exp_table_data, colWidths=[1.45 * inch, 1.95 * inch, 0.65 * inch, 0.65 * inch, 0.65 * inch, 0.65 * inch, 0.65 * inch, 0.95 * inch])
+    t_exp = Table(
+        exp_table_data,
+        colWidths=[
+            1.45 * inch,
+            1.95 * inch,
+            0.65 * inch,
+            0.65 * inch,
+            0.65 * inch,
+            0.65 * inch,
+            0.65 * inch,
+            0.95 * inch,
+        ],
+    )
     t_exp.setStyle(
         TableStyle(
             [
@@ -386,7 +404,9 @@ def build_pdf_report(output_path: Path) -> None:
     story.append(t_exp)
     story.append(Spacer(1, 4))
 
-    story.append(Paragraph("5. Visualisasi MLflow Experiment Tracking UI & Komparasi Metrik", h1_style))
+    story.append(
+        Paragraph("5. Visualisasi MLflow Experiment Tracking UI & Komparasi Metrik", h1_style)
+    )
     story.append(
         Paragraph(
             "Berikut merupakan visualisasi komprehensif dashboard eksperimen yang terekam pada backend MLflow SQLite (<code>mlflow.db</code>), "
@@ -402,14 +422,23 @@ def build_pdf_report(output_path: Path) -> None:
         story.append(
             Paragraph(
                 "<i>Gambar 1. Tampilan Dashboard MLflow UI (Experiment: dengue-weekly-forecasting) yang memuat daftar run, parameter, dan metrik.</i>",
-                ParagraphStyle("Cap1", parent=body_style, fontSize=6.8, leading=8.5, alignment=1, textColor=colors.HexColor("#64748B")),
+                ParagraphStyle(
+                    "Cap1",
+                    parent=body_style,
+                    fontSize=6.8,
+                    leading=8.5,
+                    alignment=1,
+                    textColor=colors.HexColor("#64748B"),
+                ),
             )
         )
     story.append(Spacer(1, 3))
 
     # ==================== PAGE 3 ====================
     story.append(PageBreak())
-    story.append(Paragraph("6. Analisis Hasil Eksperimen & Argumentasi Logis Pemilihan Model", h1_style))
+    story.append(
+        Paragraph("6. Analisis Hasil Eksperimen & Argumentasi Logis Pemilihan Model", h1_style)
+    )
     story.append(
         Paragraph(
             "Berdasarkan analisis empiris metrik MLflow pada Gambar 2 di bawah ini, berikut adalah argumen teknis komparatif pemilihan model terbaik:",
@@ -424,7 +453,14 @@ def build_pdf_report(output_path: Path) -> None:
         story.append(
             Paragraph(
                 "<i>Gambar 2. Komparasi Kinerja Eksperimen MLflow: (A) MAE Val vs Test, (B) Penalti Outlier RMSE, (C) Nilai R², dan (D) Kurva Sensitivitas Regularisasi Ridge (α).</i>",
-                ParagraphStyle("Cap2", parent=body_style, fontSize=6.8, leading=8.5, alignment=1, textColor=colors.HexColor("#64748B")),
+                ParagraphStyle(
+                    "Cap2",
+                    parent=body_style,
+                    fontSize=6.8,
+                    leading=8.5,
+                    alignment=1,
+                    textColor=colors.HexColor("#64748B"),
+                ),
             )
         )
     story.append(Spacer(1, 4))
@@ -472,7 +508,9 @@ def build_pdf_report(output_path: Path) -> None:
 
     # ==================== PAGE 4 ====================
     story.append(PageBreak())
-    story.append(Paragraph("7. Pendaftaran Model ke MLflow Model Registry & Metadata Deployment", h1_style))
+    story.append(
+        Paragraph("7. Pendaftaran Model ke MLflow Model Registry & Metadata Deployment", h1_style)
+    )
     story.append(
         Paragraph(
             "Sesuai rubrik dan metode pengerjaan aktivitas nomor 5, model terbaik (<code>run_05_gradient_ensemble</code>) "
@@ -489,12 +527,21 @@ def build_pdf_report(output_path: Path) -> None:
         story.append(
             Paragraph(
                 "<i>Gambar 3. Tampilan MLflow Model Registry yang memvalidasi pendaftaran model 'DengueOutbreakForecaster' Version 1 dengan status Champion.</i>",
-                ParagraphStyle("Cap3", parent=body_style, fontSize=6.8, leading=8.5, alignment=1, textColor=colors.HexColor("#64748B")),
+                ParagraphStyle(
+                    "Cap3",
+                    parent=body_style,
+                    fontSize=6.8,
+                    leading=8.5,
+                    alignment=1,
+                    textColor=colors.HexColor("#64748B"),
+                ),
             )
         )
     story.append(Spacer(1, 4))
 
-    story.append(Paragraph("Dokumentasi Model Metadata (models/registry/champion_metadata.json):", h2_style))
+    story.append(
+        Paragraph("Dokumentasi Model Metadata (models/registry/champion_metadata.json):", h2_style)
+    )
     story.append(
         Paragraph(
             "File metadata dihasilkan secara deterministik untuk menjamin integrasi mulus dengan service serving FastAPI pada tahap berikutnya:",
@@ -503,7 +550,12 @@ def build_pdf_report(output_path: Path) -> None:
     )
 
     meta_json_table = [
-        [Paragraph("<b>Ringkasan Kontrak Metadata Model Champion (models/registry/champion_metadata.json)</b>", th_style)],
+        [
+            Paragraph(
+                "<b>Ringkasan Kontrak Metadata Model Champion (models/registry/champion_metadata.json)</b>",
+                th_style,
+            )
+        ],
         [
             Paragraph(
                 """<font color='#38BDF8'>{</font><br/>
@@ -543,7 +595,9 @@ def build_pdf_report(output_path: Path) -> None:
     story.append(t_meta)
     story.append(Spacer(1, 4))
 
-    story.append(Paragraph("8. Reproduksibilitas & Verifikasi Kepatuhan Rubrik (100 Poin)", h1_style))
+    story.append(
+        Paragraph("8. Reproduksibilitas & Verifikasi Kepatuhan Rubrik (100 Poin)", h1_style)
+    )
     story.append(
         Paragraph(
             "Seluruh tahapan praktikum LK-06 dapat direproduksi secara deterministik oleh pihak evaluator dengan langkah:",
@@ -552,7 +606,12 @@ def build_pdf_report(output_path: Path) -> None:
     )
 
     repro_steps_table = [
-        [Paragraph("<b>Prosedur Eksekusi Ulang & Verifikasi Mandiri (Codespaces / Terminal)</b>", th_style)],
+        [
+            Paragraph(
+                "<b>Prosedur Eksekusi Ulang & Verifikasi Mandiri (Codespaces / Terminal)</b>",
+                th_style,
+            )
+        ],
         [
             Paragraph(
                 """<font color='#38BDF8'># 1. Pindah ke branch penugasan eksperimen</font><br/>

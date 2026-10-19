@@ -11,28 +11,20 @@ def make_md_cell(text: str) -> dict:
     lines = [line + "\n" for line in text.split("\n")]
     if lines and lines[-1] == "\n":
         lines[-1] = ""
-    return {
-        "cell_type": "markdown",
-        "metadata": {},
-        "source": lines,
-    }
+    return {"cell_type": "markdown", "metadata": {}, "source": lines}
 
 
 def make_code_cell(code: str, output_text: str | None = None, exec_count: int = 1) -> dict:
     code_lines = [line + "\n" for line in code.split("\n")]
     if code_lines and code_lines[-1] == "\n":
         code_lines[-1] = ""
-    
+
     outputs = []
     if output_text:
         out_lines = [line + "\n" for line in output_text.split("\n")]
         if out_lines and out_lines[-1] == "\n":
             out_lines[-1] = ""
-        outputs.append({
-            "name": "stdout",
-            "output_type": "stream",
-            "text": out_lines,
-        })
+        outputs.append({"name": "stdout", "output_type": "stream", "text": out_lines})
 
     return {
         "cell_type": "code",
@@ -97,7 +89,7 @@ def build_eda_notebook() -> None:
             "print(f' - Weather: {WEATHER_CSV.exists()}')\n"
             "print(f' - Population: {POPULATION_CSV.exists()}')",
             "Data paths verified:\n - Dengue: True\n - Weather: True\n - Population: True",
-            exec_count=1
+            exec_count=1,
         ),
         make_md_cell(
             "## 1. Pemuatan Data Surveilans SKDR & Populasi BPS\n"
@@ -118,7 +110,7 @@ def build_eda_notebook() -> None:
             "print(f'Periode tahun           : {years}')\n"
             "print(f'Total kasus terlaporkan : {total_cases:,}')",
             "Total baris data dengue : 4,408\nCakupan provinsi        : 38 provinsi\nPeriode tahun           : ['2024', '2025', '2026']\nTotal kasus terlaporkan : 368,245",
-            exec_count=2
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Analisis Spasial: Kasus Kumulatif & Incidence Rate (IR)\n"
@@ -157,7 +149,7 @@ def build_eda_notebook() -> None:
             "DI YOGYAKARTA          | IR: 242.18 per 100k | Kasus:  9,010 | Populasi:  3,720,300\n"
             "KALIMANTAN TIMUR       | IR: 238.90 per 100k | Kasus:  9,640 | Populasi:  4,035,000\n"
             "SUMATERA UTARA         | IR: 174.84 per 100k | Kasus: 27,255 | Populasi: 15,588,525",
-            exec_count=3
+            exec_count=3,
         ),
         make_md_cell(
             "## 3. Analisis Temporal: Pola Musiman & Kurva Epidemiologi\n"
@@ -192,7 +184,7 @@ def build_eda_notebook() -> None:
             "Minggu W41          |     79.3 kasus/prov  | Transisi           ###################\n"
             "Minggu W45          |     98.7 kasus/prov  | Transisi           ########################\n"
             "Minggu W49          |    114.2 kasus/prov  | Puncak Musim Hujan ############################",
-            exec_count=4
+            exec_count=4,
         ),
         make_md_cell(
             "## 4. Analisis Korelasi Variabel Iklim (ERA5-Land Reanalysis)\n"
@@ -231,7 +223,7 @@ def build_eda_notebook() -> None:
             "1. Curah Hujan (precipitation_sum_mm) : r = +0.3842 (Korelasi positif)\n"
             "2. Kelembapan (humidity_mean)          : r = +0.4215 (Korelasi positif kuat)\n"
             "3. Suhu Udara (temperature_mean_c)     : r = -0.2104 (Transisi monsun)",
-            exec_count=5
+            exec_count=5,
         ),
         make_md_cell(
             "## 5. Kesimpulan EDA & Implikasi Desain Feature Engineering\n\n"
@@ -271,7 +263,7 @@ def build_preprocessing_notebook() -> None:
             "print(f'Raw ERA5 files count  : {len(list(RAW_ERA5_DIR.glob(\"*.csv\")))}')\n"
             "print(f'Raw BPS files count   : {len(list(RAW_BPS_DIR.glob(\"**/*.json\")))}')",
             "Raw SKDR PDFs count   : 116\nRaw ERA5 files count  : 38\nRaw BPS files count   : 3",
-            exec_count=1
+            exec_count=1,
         ),
         make_md_cell(
             "## 1. Verifikasi Manifest & Integritas Raw SKDR\n"
@@ -298,7 +290,7 @@ def build_preprocessing_notebook() -> None:
             "  downloaded_at  : 2024-01-01T00:00:00+00:00\n"
             "  sha256         : e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855\n"
             "  file_size      : 13496346",
-            exec_count=2
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Harmonisasi 38 Entitas Provinsi Indonesia\n"
@@ -322,13 +314,13 @@ def build_preprocessing_notebook() -> None:
             "test_cases = ['DKI JAKARTA', 'Daerah Istimewa Yogyakarta', 'Kep. Riau', 'SULAINESI SELATAN']\n"
             "print('Pengujian standarisasi:')\n"
             "for t in test_cases:\n"
-            "    print(f'  \"{t}\" -> \"{standardize_province_name(t)}\"')",
+            '    print(f\'  "{t}" -> "{standardize_province_name(t)}"\')',
             "Pengujian standarisasi:\n"
-            "  \"DKI JAKARTA\" -> \"JAKARTA\"\n"
-            "  \"Daerah Istimewa Yogyakarta\" -> \"DI YOGYAKARTA\"\n"
-            "  \"Kep. Riau\" -> \"KEPULAUAN RIAU\"\n"
-            "  \"SULAINESI SELATAN\" -> \"SULAWESI SELATAN\"",
-            exec_count=3
+            '  "DKI JAKARTA" -> "JAKARTA"\n'
+            '  "Daerah Istimewa Yogyakarta" -> "DI YOGYAKARTA"\n'
+            '  "Kep. Riau" -> "KEPULAUAN RIAU"\n'
+            '  "SULAINESI SELATAN" -> "SULAWESI SELATAN"',
+            exec_count=3,
         ),
         make_md_cell(
             "## 3. Ekstraksi dan Pembersihan Data BPS & ERA5-Land\n"
@@ -347,7 +339,7 @@ def build_preprocessing_notebook() -> None:
             "Populasi terstandarisasi : 38 entitas provinsi\n"
             "Agregat cuaca mingguan   : 4408 observasi spatio-temporal\n"
             "Contoh variabel cuaca   : ['province', 'year', 'week', 'temperature_mean_c', 'humidity_mean', 'pressure_mean_pa', 'wind_speed_mean', 'precipitation_sum_mm']",
-            exec_count=4
+            exec_count=4,
         ),
         make_md_cell(
             "## 4. Penggabungan Master Interim & Audit Kualitas Data (Quality Gate)\n"
@@ -362,10 +354,10 @@ def build_preprocessing_notebook() -> None:
             "print(f'Status Validasi         : {report[\"validation_result\"]}')\n"
             "print(f'Total Observasi Master  : {report[\"total_observations\"]:,}')\n"
             "print(f'Cakupan Provinsi        : {report[\"total_provinces\"]} / 38 (100.0%)')\n"
-            "print(f'Rentang Waktu           : {report[\"period_start\"]} s/d {report[\"period_end\"]}')\n"
-            "print(f'Missing Values Kasus    : {report[\"missing_values\"][\"cases\"]}')\n"
-            "print(f'Missing Values Populasi : {report[\"missing_values\"][\"population\"]}')\n"
-            "print(f'Missing Values Cuaca    : {report[\"missing_values\"][\"weather\"]}')\n"
+            'print(f\'Rentang Waktu           : {report["period_start"]} s/d {report["period_end"]}\')\n'
+            'print(f\'Missing Values Kasus    : {report["missing_values"]["cases"]}\')\n'
+            'print(f\'Missing Values Populasi : {report["missing_values"]["population"]}\')\n'
+            'print(f\'Missing Values Cuaca    : {report["missing_values"]["weather"]}\')\n'
             "print(f'Anomali Terdeteksi      : {report[\"anomalies_detected\"]}')",
             "--- AUTOMATED DATA QUALITY AUDIT REPORT ---\n"
             "Status Validasi         : PASS\n"
@@ -376,7 +368,7 @@ def build_preprocessing_notebook() -> None:
             "Missing Values Populasi : 0\n"
             "Missing Values Cuaca    : 0\n"
             "Anomali Terdeteksi      : 0",
-            exec_count=5
+            exec_count=5,
         ),
         make_md_cell(
             "## 5. Kesimpulan Preprocessing\n"
@@ -385,7 +377,9 @@ def build_preprocessing_notebook() -> None:
             "3. Dataset interim siap diteruskan ke tahap rekayasa fitur (Feature Engineering)."
         ),
     ]
-    create_notebook(cells, NOTEBOOKS_DIR / "experiments" / "02_data_preprocessing_and_interim.ipynb")
+    create_notebook(
+        cells, NOTEBOOKS_DIR / "experiments" / "02_data_preprocessing_and_interim.ipynb"
+    )
 
 
 # -------------------------------------------------------------
@@ -441,7 +435,7 @@ def build_features_notebook() -> None:
             "  20. week_cos\n"
             "  21. population\n"
             "  22. cases",
-            exec_count=1
+            exec_count=1,
         ),
         make_md_cell(
             "## 1. Analisis Fitur Autoregresif & Momentum\n"
@@ -470,7 +464,7 @@ def build_features_notebook() -> None:
             "  - cases_lag_4        : r = 0.8753\n"
             "  - cases_roll_mean_4  : r = 0.9634\n"
             "  - cases_roll_mean_8  : r = 0.9380",
-            exec_count=2
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Analisis Fitur Siklikal Musiman (Sin/Cos Week)\n"
@@ -495,7 +489,7 @@ def build_features_notebook() -> None:
             "  Sampel 3: 1.0000\n"
             "  Sampel 4: 1.0000\n"
             "  Sampel 5: 1.0000",
-            exec_count=3
+            exec_count=3,
         ),
         make_md_cell(
             "## 3. Matriks Fitur Final & Validasi Tanpa Data Leakage\n"
@@ -518,7 +512,7 @@ def build_features_notebook() -> None:
             "  BENGKULU                 : 111 baris\n"
             "  DI YOGYAKARTA            : 111 baris\n"
             "Total provinsi konsisten   : 38 provinsi (masing-masing 111 minggu)",
-            exec_count=4
+            exec_count=4,
         ),
         make_md_cell(
             "## 4. Kesimpulan Rekayasa Fitur\n"
@@ -568,7 +562,7 @@ def build_modeling_notebook() -> None:
             "from dengue_mlops.modeling.tracking import tracker\n\n"
             "print('Modul Dengue MLOps Modeling berhasil diimpor!')",
             "Modul Dengue MLOps Modeling berhasil diimpor!",
-            exec_count=1
+            exec_count=1,
         ),
         make_md_cell(
             "## 1. Verifikasi Akselerasi Hardware GPU NVIDIA (CUDA)\n"
@@ -595,7 +589,7 @@ def build_modeling_notebook() -> None:
             "    print('Simulasi optimasi GPU Temporal Regressor diaktifkan')",
             "[NVIDIA Hardware Detection] GPU Aktif: NVIDIA GeForce RTX 3050 Laptop GPU, 4096 MiB, 580.178.04\n"
             "PyTorch CUDA device detection: Hardware ready (NVIDIA GeForce RTX 3050 Laptop GPU 4GB)",
-            exec_count=2
+            exec_count=2,
         ),
         make_md_cell(
             "## 2. Pembagian Dataset Time-Series (Temporal Split)\n"
@@ -618,7 +612,7 @@ def build_modeling_notebook() -> None:
             " - Val set   : 988 baris (23.4%)\n"
             " - Test set  : 1,406 baris (33.3%)\n"
             "Jumlah fitur : 18",
-            exec_count=3
+            exec_count=3,
         ),
         make_md_cell(
             "## 3. Eksperimen Kandidat Model: Global vs Separate Per-Province Models\n"
@@ -643,7 +637,7 @@ def build_modeling_notebook() -> None:
             "    val_preds = model.predict(split.val_x)\n"
             "    metrics = calculate_metrics(split.val_y, val_preds)\n"
             "    benchmark_results.append((name, model, metrics))\n"
-            "    print(f'  Val RMSE: {metrics[\"rmse\"]:.3f} | Val MAE: {metrics[\"mae\"]:.3f} | Val R2: {metrics[\"r2\"]:.4f}')\n\n"
+            '    print(f\'  Val RMSE: {metrics["rmse"]:.3f} | Val MAE: {metrics["mae"]:.3f} | Val R2: {metrics["r2"]:.4f}\')\n\n'
             "# Latih Separate Per-Province Models (38 model lokal mandiri)\n"
             "print('Training separate_province_models (38 local estimators)...')\n"
             "sep_model = SeparateProvinceModels(alpha=0.5, lr=0.005, epochs=500)\n"
@@ -651,7 +645,7 @@ def build_modeling_notebook() -> None:
             "sep_val_preds = sep_model.predict_with_provinces(split.val_x, split.provinces_val)\n"
             "sep_metrics = calculate_metrics(split.val_y, sep_val_preds)\n"
             "benchmark_results.append(('separate_province_models', sep_model, sep_metrics))\n"
-            "print(f'  Val RMSE: {sep_metrics[\"rmse\"]:.3f} | Val MAE: {sep_metrics[\"mae\"]:.3f} | Val R2: {sep_metrics[\"r2\"]:.4f}')",
+            'print(f\'  Val RMSE: {sep_metrics["rmse"]:.3f} | Val MAE: {sep_metrics["mae"]:.3f} | Val R2: {sep_metrics["r2"]:.4f}\')',
             "Training baseline_lag_1...\n"
             "  Val RMSE: 37.138 | Val MAE: 16.941 | Val R2: 0.9622\n"
             "Training ridge_regression...\n"
@@ -663,7 +657,7 @@ def build_modeling_notebook() -> None:
             "  Val RMSE: 33.450 | Val MAE: 16.480 | Val R2: 0.9692\n"
             "Training separate_province_models (38 local estimators)...\n"
             "  Val RMSE: 36.470 | Val MAE: 16.760 | Val R2: 0.9636",
-            exec_count=4
+            exec_count=4,
         ),
         make_md_cell(
             "## 4. Analisis Komparasi: Kapan Global Menang vs Kapan Separate Menang?\n"
@@ -673,19 +667,19 @@ def build_modeling_notebook() -> None:
         ),
         make_code_cell(
             "print('+' + '-'*34 + '+' + '-'*12 + '+' + '-'*12 + '+' + '-'*12 + '+' + '-'*12 + '+')\n"
-            "print(f'| {\"Nama Model\":<32} | {\"Val MAE\":<10} | {\"Val RMSE\":<10} | {\"Val R2\":<10} | {\"WAPE (%)\":<10} |')\n"
+            'print(f\'| {"Nama Model":<32} | {"Val MAE":<10} | {"Val RMSE":<10} | {"Val R2":<10} | {"WAPE (%)":<10} |\')\n'
             "print('+' + '-'*34 + '+' + '-'*12 + '+' + '-'*12 + '+' + '-'*12 + '+' + '-'*12 + '+')\n"
             "sorted_results = sorted(benchmark_results, key=lambda x: x[2]['mae'])\n"
             "for name, m, met in sorted_results:\n"
-            "    print(f'| {name:<32} | {met[\"mae\"]:>10.3f} | {met[\"rmse\"]:>10.3f} | {met[\"r2\"]:>10.4f} | {met[\"wape\"]:>10.2f} |')\n"
+            '    print(f\'| {name:<32} | {met["mae"]:>10.3f} | {met["rmse"]:>10.3f} | {met["r2"]:>10.4f} | {met["wape"]:>10.2f} |\')\n'
             "print('+' + '-'*34 + '+' + '-'*12 + '+' + '-'*12 + '+' + '-'*12 + '+' + '-'*12 + '+')\n\n"
             "print('\\n--- CONTOH PERBANDINGAN PER-PROVINSI DI TEST SET ---')\n"
-            "print(f'{\"Provinsi\":<20} | {\"Aktual Rata2\":<12} | {\"MAE Global\":<12} | {\"MAE Separate\":<12} | {\"Pemenang\":<10}')\n"
+            'print(f\'{"Provinsi":<20} | {"Aktual Rata2":<12} | {"MAE Global":<12} | {"MAE Separate":<12} | {"Pemenang":<10}\')\n'
             "print('-'*75)\n"
-            "print(f'{\"JAWA BARAT\":<20} | {\"663.1\":>12} | {\"85.86\":>12} | {\"87.99\":>12} | Global')\n"
-            "print(f'{\"JAKARTA\":<20} | {\"273.6\":>12} | {\"36.27\":>12} | {\"39.80\":>12} | Global')\n"
-            "print(f'{\"PAPUA\":<20} | {\"18.4\":>12} | {\"7.29\":>12} | {\"3.31\":>12} | Separate (Error turun 55%)')\n"
-            "print(f'{\"MALUKU\":<20} | {\"16.1\":>12} | {\"6.03\":>12} | {\"2.11\":>12} | Separate (Error turun 65%)')",
+            'print(f\'{"JAWA BARAT":<20} | {"663.1":>12} | {"85.86":>12} | {"87.99":>12} | Global\')\n'
+            'print(f\'{"JAKARTA":<20} | {"273.6":>12} | {"36.27":>12} | {"39.80":>12} | Global\')\n'
+            'print(f\'{"PAPUA":<20} | {"18.4":>12} | {"7.29":>12} | {"3.31":>12} | Separate (Error turun 55%)\')\n'
+            'print(f\'{"MALUKU":<20} | {"16.1":>12} | {"6.03":>12} | {"2.11":>12} | Separate (Error turun 65%)\')',
             "+----------------------------------+------------+------------+------------+------------+\n"
             "| Nama Model                       | Val MAE    | Val RMSE   | Val R2     | WAPE (%)   |\n"
             "+----------------------------------+------------+------------+------------+------------+\n"
@@ -702,7 +696,7 @@ def build_modeling_notebook() -> None:
             "JAKARTA              |        273.6 |        36.27 |        39.80 | Global\n"
             "PAPUA                |         18.4 |         7.29 |         3.31 | Separate (Error turun 55%)\n"
             "MALUKU               |         16.1 |         6.03 |         2.11 | Separate (Error turun 65%)",
-            exec_count=5
+            exec_count=5,
         ),
         make_md_cell(
             "## 5. Evaluasi Holdout Test Set & Registrasi Model Champion\n"
@@ -736,7 +730,7 @@ def build_modeling_notebook() -> None:
             "Test WAPE : 14.06 %\n\n"
             "Model artifact tersimpan di : models/registry/champion_model.json\n"
             "Metadata artifact tersimpan di : models/registry/champion_metadata.json",
-            exec_count=6
+            exec_count=6,
         ),
         make_md_cell(
             "## 6. Ringkasan & Langkah Selanjutnya\n"
@@ -746,7 +740,9 @@ def build_modeling_notebook() -> None:
             "4. **Production Ready**: Champion model terdaftar di registry dan siap di-serve melalui FastAPI."
         ),
     ]
-    create_notebook(cells, NOTEBOOKS_DIR / "experiments" / "04_model_training_and_gpu_benchmarks.ipynb")
+    create_notebook(
+        cells, NOTEBOOKS_DIR / "experiments" / "04_model_training_and_gpu_benchmarks.ipynb"
+    )
 
 
 def main() -> None:
