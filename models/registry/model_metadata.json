@@ -1,7 +1,7 @@
 {
   "model_name": "gradient_ensemble_regressor",
   "version": "1.0.0",
-  "promoted_at": "2026-10-19T16:18:21.423277+00:00",
+  "promoted_at": "2026-10-19T16:41:35.140609+00:00",
   "metrics": {
     "rmse": 29.149,
     "mae": 13.752,

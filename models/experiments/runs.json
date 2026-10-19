@@ -2230,5 +2230,101 @@
     },
     "artifacts": [],
     "end_time": "2026-10-19T16:18:21.412808+00:00"
+  },
+  {
+    "run_id": "e99c34e1",
+    "run_name": "train_baseline_lag_1",
+    "experiment_name": "indonesia-dengue-forecast",
+    "start_time": "2026-10-19T16:41:29.822936+00:00",
+    "status": "COMPLETED",
+    "params": {
+      "model_name": "baseline_lag_1",
+      "seed": 42,
+      "version": "1.0.0"
+    },
+    "metrics": {
+      "train_rmse": 42.533,
+      "train_mae": 18.726,
+      "train_r2": 0.9463,
+      "train_wape": 16.14,
+      "val_rmse": 37.138,
+      "val_mae": 16.941,
+      "val_r2": 0.9622,
+      "val_wape": 13.74
+    },
+    "artifacts": [],
+    "end_time": "2026-10-19T16:41:30.542364+00:00"
+  },
+  {
+    "run_id": "69d8800c",
+    "run_name": "train_ridge_regression",
+    "experiment_name": "indonesia-dengue-forecast",
+    "start_time": "2026-10-19T16:41:30.549581+00:00",
+    "status": "COMPLETED",
+    "params": {
+      "model_name": "ridge_regression",
+      "seed": 42,
+      "version": "1.0.0"
+    },
+    "metrics": {
+      "train_rmse": 35.764,
+      "train_mae": 17.602,
+      "train_r2": 0.9621,
+      "train_wape": 15.17,
+      "val_rmse": 35.123,
+      "val_mae": 18.443,
+      "val_r2": 0.9662,
+      "val_wape": 14.96
+    },
+    "artifacts": [],
+    "end_time": "2026-10-19T16:41:32.323635+00:00"
+  },
+  {
+    "run_id": "01c62027",
+    "run_name": "train_gradient_ensemble_regressor",
+    "experiment_name": "indonesia-dengue-forecast",
+    "start_time": "2026-10-19T16:41:32.331884+00:00",
+    "status": "COMPLETED",
+    "params": {
+      "model_name": "gradient_ensemble_regressor",
+      "seed": 42,
+      "version": "1.0.0"
+    },
+    "metrics": {
+      "train_rmse": 35.475,
+      "train_mae": 16.69,
+      "train_r2": 0.9627,
+      "train_wape": 14.38,
+      "val_rmse": 32.933,
+      "val_mae": 16.36,
+      "val_r2": 0.9703,
+      "val_wape": 13.27
+    },
+    "artifacts": [],
+    "end_time": "2026-10-19T16:41:34.439815+00:00"
+  },
+  {
+    "run_id": "3b4dbe3d",
+    "run_name": "train_pytorch_temporal_regressor",
+    "experiment_name": "indonesia-dengue-forecast",
+    "start_time": "2026-10-19T16:41:34.446377+00:00",
+    "status": "COMPLETED",
+    "params": {
+      "model_name": "pytorch_temporal_regressor",
+      "seed": 42,
+      "version": "1.0.0"
+    },
+    "metrics": {
+      "train_rmse": 36.969,
+      "train_mae": 17.991,
+      "train_r2": 0.9595,
+      "train_wape": 15.5,
+      "val_rmse": 36.197,
+      "val_mae": 19.149,
+      "val_r2": 0.9641,
+      "val_wape": 15.53
+    },
+    "artifacts": [],
+    "end_time": "2026-10-19T16:41:35.128276+00:00"
   }
 ]

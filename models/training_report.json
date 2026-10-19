@@ -23,7 +23,7 @@
         "r2": 0.9622,
         "wape": 13.74
       },
-      "run_id": "c216b7d1"
+      "run_id": "e99c34e1"
     },
     {
       "model_name": "ridge_regression",
@@ -39,7 +39,7 @@
         "r2": 0.9662,
         "wape": 14.96
       },
-      "run_id": "fe3c9330"
+      "run_id": "69d8800c"
     },
     {
       "model_name": "gradient_ensemble_regressor",
@@ -55,7 +55,7 @@
         "r2": 0.9703,
         "wape": 13.27
       },
-      "run_id": "358c17de"
+      "run_id": "01c62027"
     },
     {
       "model_name": "pytorch_temporal_regressor",
@@ -71,7 +71,7 @@
         "r2": 0.9641,
         "wape": 15.53
       },
-      "run_id": "8f7aa79e"
+      "run_id": "3b4dbe3d"
     }
   ],
   "model_file": "models/registry/champion_model.json",
