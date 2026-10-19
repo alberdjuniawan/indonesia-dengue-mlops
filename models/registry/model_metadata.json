@@ -1,0 +1,37 @@
+{
+  "model_name": "gradient_ensemble_regressor",
+  "version": "1.0.0",
+  "promoted_at": "2026-10-19T16:18:21.423277+00:00",
+  "metrics": {
+    "rmse": 29.149,
+    "mae": 13.752,
+    "r2": 0.9658,
+    "wape": 14.06
+  },
+  "feature_count": 21,
+  "features": [
+    "cases_lag_1",
+    "cases_lag_2",
+    "cases_lag_3",
+    "cases_lag_4",
+    "cases_roll_mean_4w",
+    "cases_roll_std_4w",
+    "incidence_lag_1",
+    "incidence_lag_2",
+    "temp_mean_lag_1",
+    "temp_mean_lag_2",
+    "temp_roll_mean_4w",
+    "humidity_mean_lag_1",
+    "humidity_mean_lag_2",
+    "humidity_roll_mean_4w",
+    "rainfall_sum_lag_1",
+    "rainfall_sum_lag_2",
+    "rainfall_roll_sum_4w",
+    "wind_speed_lag_1",
+    "sin_week",
+    "cos_week",
+    "population"
+  ],
+  "description": "Champion gradient_ensemble_regressor trained on historical dengue data",
+  "status": "CHAMPION"
+}

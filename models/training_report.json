@@ -1,0 +1,79 @@
+{
+  "status": "SUCCESS",
+  "champion_model": "gradient_ensemble_regressor",
+  "version": "1.0.0",
+  "test_metrics": {
+    "rmse": 29.149,
+    "mae": 13.752,
+    "r2": 0.9658,
+    "wape": 14.06
+  },
+  "candidates": [
+    {
+      "model_name": "baseline_lag_1",
+      "train_metrics": {
+        "rmse": 42.533,
+        "mae": 18.726,
+        "r2": 0.9463,
+        "wape": 16.14
+      },
+      "val_metrics": {
+        "rmse": 37.138,
+        "mae": 16.941,
+        "r2": 0.9622,
+        "wape": 13.74
+      },
+      "run_id": "c216b7d1"
+    },
+    {
+      "model_name": "ridge_regression",
+      "train_metrics": {
+        "rmse": 35.764,
+        "mae": 17.602,
+        "r2": 0.9621,
+        "wape": 15.17
+      },
+      "val_metrics": {
+        "rmse": 35.123,
+        "mae": 18.443,
+        "r2": 0.9662,
+        "wape": 14.96
+      },
+      "run_id": "fe3c9330"
+    },
+    {
+      "model_name": "gradient_ensemble_regressor",
+      "train_metrics": {
+        "rmse": 35.475,
+        "mae": 16.69,
+        "r2": 0.9627,
+        "wape": 14.38
+      },
+      "val_metrics": {
+        "rmse": 32.933,
+        "mae": 16.36,
+        "r2": 0.9703,
+        "wape": 13.27
+      },
+      "run_id": "358c17de"
+    },
+    {
+      "model_name": "pytorch_temporal_regressor",
+      "train_metrics": {
+        "rmse": 36.969,
+        "mae": 17.991,
+        "r2": 0.9595,
+        "wape": 15.5
+      },
+      "val_metrics": {
+        "rmse": 36.197,
+        "mae": 19.149,
+        "r2": 0.9641,
+        "wape": 15.53
+      },
+      "run_id": "8f7aa79e"
+    }
+  ],
+  "model_file": "models/registry/champion_model.json",
+  "metadata_file": "models/registry/model_metadata.json"
+}
