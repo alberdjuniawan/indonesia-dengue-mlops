@@ -4,10 +4,10 @@ from pydantic import BaseModel, Field
 
 
 class DenguePredictionRequest(BaseModel):
-    province: str = Field(..., example="JAWA BARAT")
-    year: int = Field(..., ge=2020, le=2030, example=2026)
-    week: int = Field(..., ge=1, le=53, example=13)
-    cases_lag_1: float = Field(..., ge=0.0, example=650.0)
+    province: str = Field(..., examples=["JAWA BARAT"])
+    year: int = Field(..., ge=2020, le=2030, examples=[2026])
+    week: int = Field(..., ge=1, le=53, examples=[13])
+    cases_lag_1: float = Field(..., ge=0.0, examples=[650.0])
     cases_lag_2: float = Field(default=640.0, ge=0.0)
     cases_lag_3: float = Field(default=630.0, ge=0.0)
     cases_lag_4: float = Field(default=620.0, ge=0.0)
@@ -15,7 +15,7 @@ class DenguePredictionRequest(BaseModel):
     cases_roll_std_4w: float = Field(default=12.0, ge=0.0)
     incidence_lag_1: float = Field(default=1.29, ge=0.0)
     incidence_lag_2: float = Field(default=1.27, ge=0.0)
-    temp_mean_lag_1: float = Field(default=26.8, example=27.0)
+    temp_mean_lag_1: float = Field(default=26.8, examples=[27.0])
     temp_mean_lag_2: float = Field(default=26.9)
     temp_roll_mean_4w: float = Field(default=26.8)
     humidity_mean_lag_1: float = Field(default=82.0)

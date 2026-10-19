@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from dengue_mlops.modeling.models import BaselineLagModel
 from dengue_mlops.modeling.registry import load_champion, register_champion
-from dengue_mlops.modeling.trainer import run_training_pipeline
 from dengue_mlops.serving.app import (
     get_metrics_exposition,
     health_check,
@@ -74,6 +73,3 @@ def test_feedback_and_metrics_endpoints() -> None:
     metrics_resp = get_metrics_exposition()
     assert metrics_resp.status_code == 200
     assert b"dengue_prediction_requests_total" in metrics_resp.body
-
-    # Restore production champion
-    run_training_pipeline(model_version="1.0.0")
