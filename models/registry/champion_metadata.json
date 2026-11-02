@@ -1,10 +1,10 @@
 {
   "model_name": "DengueOutbreakForecaster",
-  "champion_run_id": "43028af0bc854725ae85f00013c09489",
-  "champion_run_name": "run_05_gradient_ensemble",
+  "champion_run_id": "780b91ed3b9a49f5abcca26e45dcf2c9",
+  "champion_run_name": "run_07_lk7_challenger_tuned",
   "model_family": "gradient_ensemble_regressor",
-  "mlflow_model_version": 3,
-  "registered_alias": "champion",
+  "mlflow_model_version": 5,
+  "registered_alias": "production",
   "dataset_version": "v2.0-data",
   "feature_count": 21,
   "feature_names": [
@@ -40,22 +40,22 @@
   },
   "performance": {
     "validation": {
-      "rmse": 32.933,
-      "mae": 16.36,
-      "r2": 0.9703,
-      "wape": 13.27
+      "rmse": 35.687,
+      "mae": 16.576,
+      "r2": 0.9643,
+      "wape": 13.49
     },
     "holdout_test": {
-      "rmse": 29.149,
-      "mae": 13.752,
-      "r2": 0.9658,
-      "wape": 14.06
+      "rmse": 29.445,
+      "mae": 14.469,
+      "r2": 0.9664,
+      "wape": 14.66
     },
     "train": {
-      "rmse": 35.475,
-      "mae": 16.69,
-      "r2": 0.9627,
-      "wape": 14.38
+      "rmse": 34.844,
+      "mae": 16.472,
+      "r2": 0.9641,
+      "wape": 14.12
     }
   },
   "deployment_recommendation": {
@@ -64,10 +64,15 @@
     "docker_image": "indonesia-dengue-mlops/api:latest",
     "sla_check": {
       "r2_sla_minimum": 0.8,
-      "achieved_test_r2": 0.9658,
+      "achieved_test_r2": 0.9664,
       "mae_sla_maximum": 25.0,
-      "achieved_test_mae": 13.752,
+      "achieved_test_mae": 14.469,
       "passed": true
     }
-  }
+  },
+  "registry_stage": "Production",
+  "lifecycle_assignment": "LK-07",
+  "promoted_at": "2026-11-02T03:22:23.160648+00:00",
+  "promoted_at_lk07": "2026-11-02T03:22:23.192659+00:00",
+  "dvc_lineage_reference": "models/registry/production_model.yaml"
 }

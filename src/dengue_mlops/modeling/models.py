@@ -144,10 +144,22 @@ class RidgeRegressionModel(BaseModel):
 class EnsembleGradientRegressor(BaseModel):
     """Ensemble combiner blending Ridge and Auto-Regressive Momentum."""
 
-    def __init__(self, ridge_weight: float = 0.65, lag_weight: float = 0.35) -> None:
+    def __init__(
+        self,
+        ridge_weight: float = 0.65,
+        lag_weight: float = 0.35,
+        sub_ridge_alpha: float = 0.5,
+        sub_ridge_lr: float = 0.005,
+        sub_ridge_epochs: int = 600,
+    ) -> None:
         self.ridge_weight = ridge_weight
         self.lag_weight = lag_weight
-        self.ridge = RidgeRegressionModel(alpha=0.5, lr=0.005, epochs=600)
+        self.sub_ridge_alpha = sub_ridge_alpha
+        self.sub_ridge_lr = sub_ridge_lr
+        self.sub_ridge_epochs = sub_ridge_epochs
+        self.ridge = RidgeRegressionModel(
+            alpha=sub_ridge_alpha, lr=sub_ridge_lr, epochs=sub_ridge_epochs
+        )
         self.baseline = BaselineLagModel(lag_idx=0)
         self.name = "gradient_ensemble_regressor"
 
@@ -170,6 +182,9 @@ class EnsembleGradientRegressor(BaseModel):
             "name": self.name,
             "ridge_weight": self.ridge_weight,
             "lag_weight": self.lag_weight,
+            "sub_ridge_alpha": self.sub_ridge_alpha,
+            "sub_ridge_lr": self.sub_ridge_lr,
+            "sub_ridge_epochs": self.sub_ridge_epochs,
             "ridge": self.ridge.to_dict(),
             "baseline": self.baseline.to_dict(),
         }
@@ -177,10 +192,16 @@ class EnsembleGradientRegressor(BaseModel):
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> EnsembleGradientRegressor:
         model = cls(
-            ridge_weight=data.get("ridge_weight", 0.65), lag_weight=data.get("lag_weight", 0.35)
+            ridge_weight=data.get("ridge_weight", 0.65),
+            lag_weight=data.get("lag_weight", 0.35),
+            sub_ridge_alpha=data.get("sub_ridge_alpha", 0.5),
+            sub_ridge_lr=data.get("sub_ridge_lr", 0.005),
+            sub_ridge_epochs=data.get("sub_ridge_epochs", 600),
         )
-        model.ridge = RidgeRegressionModel.from_dict(data["ridge"])
-        model.baseline = BaselineLagModel.from_dict(data["baseline"])
+        if "ridge" in data:
+            model.ridge = RidgeRegressionModel.from_dict(data["ridge"])
+        if "baseline" in data:
+            model.baseline = BaselineLagModel.from_dict(data["baseline"])
         return model
 
 

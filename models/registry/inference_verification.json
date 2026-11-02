@@ -1,0 +1,62 @@
+{
+  "generated_at": "2026-11-02T03:22:25.611369+00:00",
+  "assignment": "LK-07",
+  "status": "PASSED",
+  "model_name": "DengueOutbreakForecaster",
+  "model_version": 5,
+  "resolved_uri": "models:/DengueOutbreakForecaster/Production",
+  "model_load_latency_seconds": 0.5555220329999884,
+  "batch_size": 6,
+  "prediction_latency_seconds_p50": 0.000245686999960526,
+  "predictions": [
+    {
+      "province": "JAWA TIMUR",
+      "year": 2026,
+      "week": 12,
+      "predicted_cases": 803.66,
+      "risk_level": "SIAGA"
+    },
+    {
+      "province": "JAWA BARAT",
+      "year": 2026,
+      "week": 12,
+      "predicted_cases": 865.84,
+      "risk_level": "SIAGA"
+    },
+    {
+      "province": "JAWA TENGAH",
+      "year": 2026,
+      "week": 12,
+      "predicted_cases": 630.87,
+      "risk_level": "SIAGA"
+    },
+    {
+      "province": "JAKARTA",
+      "year": 2026,
+      "week": 12,
+      "predicted_cases": 397.07,
+      "risk_level": "SIAGA"
+    },
+    {
+      "province": "BANTEN",
+      "year": 2026,
+      "week": 12,
+      "predicted_cases": 261.28,
+      "risk_level": "SIAGA"
+    },
+    {
+      "province": "SUMATERA UTARA",
+      "year": 2026,
+      "week": 12,
+      "predicted_cases": 305.3,
+      "risk_level": "SIAGA"
+    }
+  ],
+  "checks": {
+    "load_by_production_stage": true,
+    "load_by_alias": true,
+    "predictions_finite": true,
+    "predictions_non_negative": true,
+    "row_count_preserved": true
+  }
+}
