@@ -34,21 +34,42 @@ Thumbs.db
 *.log
 logs/
 
+# DVC Pointer and Directory Rules
+!*.dvc
+!**/.dvc
+!**/.gitignore
+
 # Raw data
 data/raw/*
 !data/raw/.gitkeep
+!data/raw/*.dvc
+!data/raw/**/*.dvc
+!data/raw/.gitignore
+!data/raw/**/.gitignore
 
 # Intermediate data
 data/interim/*
 !data/interim/.gitkeep
+!data/interim/*.dvc
+!data/interim/**/*.dvc
+!data/interim/.gitignore
+!data/interim/**/.gitignore
 
 # Processed data
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/*.dvc
+!data/processed/**/*.dvc
+!data/processed/.gitignore
+!data/processed/**/.gitignore
 
 # Features
 data/features/*
 !data/features/.gitkeep
+!data/features/*.dvc
+!data/features/**/*.dvc
+!data/features/.gitignore
+!data/features/**/.gitignore
 
 # Model artifacts
 models/checkpoints/*
@@ -61,3 +82,5 @@ models/registry/*
 mlruns/
 wandb/
 artifacts/
+*.db
+mlflow.db

@@ -31,8 +31,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "dvc>=3.67.1",
     "pre-commit>=4.3.0",
     "pytest>=9.1.1",
+    "reportlab>=5.0.1",
     "ruff>=0.16.6",
 ]
 
@@ -48,6 +50,7 @@ split-on-trailing-comma = false
 [tool.ruff.lint.per-file-ignores]
 "src/dengue_mlops/ingestion/skdr/ocr.py" = ["BLE001"]
 "scripts/build_dengue_dataset.py" = ["BLE001"]
+"scripts/ingest_data.py" = ["BLE001"]
 
 [build-system]
 requires = ["hatchling"]
