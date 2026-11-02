@@ -79,6 +79,10 @@ models/registry/*
 !models/registry/.gitkeep
 !models/registry/champion_metadata.json
 !models/registry/model_metadata.json
+!models/registry/production_model.yaml
+!models/registry/stage_transition_log.json
+!models/registry/version_comparison.json
+!models/registry/inference_verification.json
 
 # Experiment tracking
 mlruns/
@@ -86,3 +90,6 @@ wandb/
 artifacts/
 *.db
 mlflow.db
+
+# PDF reports
+*.pdf

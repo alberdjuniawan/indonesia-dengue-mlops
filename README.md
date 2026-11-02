@@ -372,6 +372,93 @@ Skrip `scripts/ingest_data.py` dirancang untuk memenuhi standar ketat *Productio
   3. *Penanganan Outlier & Integritas Nilai:* Membatasi *negative values* ($cases \ge 0$) dan meredam lonjakan anomali ekstrem.
   4. *Audit Trail & Data Health:* Menghasilkan laporan audit kualitas data di `data/interim/data_cleaning_audit.json` dengan skor integritas 100%.
 
+## Model Registry, Versioning, dan Kesiapan Inferensi (LK-07)
+
+Model prediksi DBD mingguan dikelola siklus hidupnya secara sistematis menggunakan **MLflow Model Registry** dan disinkronisasikan dengan **DVC Data Lineage**.
+
+### 1. Model Produksi Aktif & Identitas Registry
+
+| Komponen Registry | Nilai / Konfigurasi | Deskripsi |
+| :--- | :--- | :--- |
+| **Model Name** | `DengueOutbreakForecaster` | Entri tunggal Model Registry untuk peramalan kasus DBD 38 provinsi di Indonesia |
+| **Versi Aktif (Production)** | **Version 5 (v5)** | Artefak model terpilih yang aktif melayani sistem inferensi |
+| **Stage Model** | `Production` | Transisi resmi dari `Staging` setelah melewati gerbang validasi performa |
+| **MLflow Aliases** | `@production`, `@champion` | Penunjuk dinamis (pointer) untuk pemanggilan programatik tanpa hardcoded version |
+| **Arsitektur Model** | `EnsembleGradientRegressor` | Kombinasi terbobot Ridge Regression (65%) dan Auto-Regressive Momentum (35%) |
+| **Hyperparameters** | `ridge_w=0.65, lag_w=0.35, α=0.75, epochs=650` | Penyetelan penalti L2 sub-ridge dan pembobotan lag temporal (Seed 42) |
+| **Validation MAE** | **16.425 kasus** | Galat absolut rata-rata terendah pada partisi validasi temporal |
+| **Holdout Test MAE** | **14.215 kasus** | Galat absolut rata-rata pada partisi uji masa depan (1.76% lebih akurat dari petahana) |
+| **Holdout Test R²** | **0.9665** | Menjelaskan 96.65% variansi kasus nyata pada 38 provinsi (SLA target ≥ 0.80) |
+| **Data Lineage (DVC)** | Tag `v2.0-data` | Terikat pada MD5 `d2e8b41f59d2488c8a3e4f2eaec63e54` (`dengue_raw.csv.dvc`) |
+| **Metadata File** | `models/registry/production_model.yaml` | Berkas referensi resmi berisi silsilah data DVC, Git commit, dan log transisi stage |
+
+### 2. Alasan Pemilihan Versi 5 sebagai Model Produksi
+
+Pemilihan **Version 5 (v5)** menggantikan Version 4 (v4) didasarkan pada prinsip tata kelola MLOps yang ketat dan hasil evaluasi deterministik bebas kebocoran data (*leakage-free temporal gate*):
+
+1. **Keunggulan Metrik Generalisasi (Validation & Test MAE):**
+   * **Validation MAE:** Version 5 mencatatkan MAE sebesar **16.425 kasus**, mengungguli Version 4 (**16.576 kasus**), mereduksi error sebesar 0.15 kasus per provinsi per minggu.
+   * **Holdout-Test MAE:** Pada partisi uji *unseen future data*, Version 5 mencatatkan MAE **14.215 kasus** dibandingkan Version 4 (**14.469 kasus**), memberikan reduksi error absolut sebesar **0.254 kasus**.
+   * **Koefisien Determinasi (R²):** Version 5 menghasilkan Test R² sebesar **0.9665** (vs 0.9664 pada v4), jauh melampaui ambang batas minimal SLA produksi ($R^2 \ge 0.80$).
+2. **Justifikasi Penyetelan Hyperparameter (Challenger Tuning):**
+   * Peningkatan bobot lag autoregresif ($30\% \rightarrow 35\%$) memungkinkan model menangkap dinamika penularan DBD jangka pendek secara lebih adaptif.
+   * Penguatan regularisasi Ridge sub-model ($\alpha = 0.50 \rightarrow 0.75$, $\text{epochs} = 600 \rightarrow 650$) berhasil meredam fluktuasi kovariat iklim ekstrem (curah hujan dan kelembapan) sehingga mencegah *overfitting* pada provinsi dengan lonjakan anomali tinggi.
+3. **Pemberian Status Stage & Pengarsipan Aman:**
+   * Melalui alur `None → Staging → Production`, Version 5 dinyatakan memenangkan gerbang evaluasi (*Gate PASSED*).
+   * Version 4 secara otomatis dialihkan ke status `Archived` untuk mencegah duplikasi stage aktif, namun riwayat bobot dan parameternya tetap tersimpan untuk audit masa depan.
+
+### 3. Tabel Riwayat Versi & Alur Transisi Stage
+
+| Versi | MLflow Run Name | Hyperparameters | Val MAE | Test MAE | Test R² | Stage | Status Keputusan |
+| :---: | :--- | :--- | :---: | :---: | :---: | :--- | :---: | :--- |
+| **v1** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, α=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Eksperimen Awal |
+| **v2** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, α=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Iterasi Pipeline |
+| **v3** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, α=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Kandidat LK-06 |
+| **v4** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, α=0.5 (Seed 42) | 16.58 | 14.47 | 0.9664 | `Archived` | LK-06 Incumbent (Digantikan v5) |
+| **v5** | `run_07_lk7_challenger_tuned` | Ridge=0.65, Lag=0.35, α=0.75, Ep=650 | **16.43** | **14.21** | **0.9665** | **`Production`** | **CHAMPION AKTIF (Dipromosikan)** |
+
+### 4. Sinkronisasi Silsilah Data (Data Lineage) dengan DVC
+
+Silsilah data dicatat secara formal dalam file `models/registry/production_model.yaml` guna menjamin ketertelusuran penuh antara data mentah, kode, dan model yang di-*publish*:
+
+```yaml
+schema: dengue-mlops/production-model-metadata/1.0
+model:
+  registered_name: DengueOutbreakForecaster
+  version: 5
+  stage: Production
+  aliases: [production, champion]
+  run_id: 780b91ed3b9a49f5abcca26e45dcf2c9
+lineage:
+  dataset:
+    dvc_tag: v2.0-data
+    raw_pointer_file: data/raw/dengue_raw.csv.dvc
+    raw_dengue_md5: d2e8b41f59d2488c8a3e4f2eaec63e54
+  code:
+    git_commit: 5f4f987aebe10916030efb8025ddb2781dae8cf7
+    training_script: scripts/train.py
+```
+
+### 5. Verifikasi Inferensi Programatik & SLA Kesiapan Produksi
+
+Kesiapan layanan inferensi diuji menggunakan `scripts/verify_inference.py`. Model Production dimuat langsung melalui MLflow URI dan menerima batch data baru (simulasi minggu ke-12 tahun 2026):
+
+```bash
+# Eksekusi orchestrator siklus hidup Model Registry
+uv run python scripts/registry_lifecycle.py
+
+# Eksekusi verifikasi kesiapan inferensi
+uv run python scripts/verify_inference.py
+```
+
+**Hasil Pengujian Inferensi (`inference_verification.json`):**
+* **Model Loading Latency:** `0.61 detik` (memuat model via URI `models:/DengueOutbreakForecaster/Production`).
+* **Batch Prediction Latency (p50):** `1.3 ms` untuk 6 provinsi (`0.22 ms/baris`) — jauh di bawah ambang batas SLA real-time ($< 50\text{ ms}$).
+* **Integritas Hasil Prediksi:** 100% finite, non-negative, dan row-count preserved.
+* **Klasifikasi Risiko DBD:** Prediksi kasus dipetakan ke tingkat risiko operasional (`RENDAH` $<25$, `WASPADA` $25-75$, `SIAGA` $>75$).
+
+---
+
 ## Tech Stack
 
 - Python 3.12

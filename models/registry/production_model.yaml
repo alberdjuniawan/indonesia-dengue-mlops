@@ -1,0 +1,114 @@
+schema: dengue-mlops/production-model-metadata/1.0
+assignment: 'LK-07: Model Registry, Versioning, dan Kesiapan Inferensi'
+generated_at: '2026-11-02T03:22:23.182188+00:00'
+purpose: Referensi model yang sudah di-publish (Production) dengan silsilah data (data
+  lineage) DVC/Git agar reproduksibel dan teraudit.
+model:
+  registered_name: DengueOutbreakForecaster
+  version: 5
+  stage: Production
+  aliases:
+  - production
+  - champion
+  run_id: 780b91ed3b9a49f5abcca26e45dcf2c9
+  logged_model_id: m-9155fea4ea66442da7365171fe974abd
+  source: /home/berdangry/Documents/indonesia-dengue-mlops/mlruns/1/models/m-9155fea4ea66442da7365171fe974abd/artifacts
+  creation_time_utc: '2026-11-01T16:16:12.308000+00:00'
+  family: gradient_ensemble_regressor
+  hyperparameters:
+    model_type: ensemble_gradient
+    ridge_weight: '0.65'
+    lag_weight: '0.35'
+    sub_ridge_alpha: '0.75'
+    sub_ridge_epochs: '650'
+    seed: '42'
+  feature_count: 21
+  tracking_uri: sqlite:///mlflow.db
+  experiment_name: dengue-weekly-forecasting
+performance:
+  validation:
+    val_mae: 16.425
+    val_rmse: 35.825
+    val_r2: 0.964
+    val_wape: 13.36
+  holdout_test:
+    test_mae: 14.215
+    test_rmse: 29.407
+    test_r2: 0.9665
+    test_wape: 14.4
+  sla:
+    r2_minimum: 0.8
+    mae_maximum: 25.0
+    passed: true
+lineage:
+  dataset:
+    dvc_tag: v2.0-data
+    raw_pointer_file: data/raw/dengue_raw.csv.dvc
+    raw_dengue_md5: d2e8b41f59d2488c8a3e4f2eaec63e54
+    raw_dengue_size_bytes: 255907
+  dvc_lock_outputs:
+    models/registry/champion_model.json: 49d24c94f64ad22fa0c2e7682cc56dad
+    models/training_report.json: 8a23d4bb4ce3d9e90468cc9b557a825e
+    models/evaluation_report.json: 3b9673533c459761294e063840f6f2ab
+  code:
+    git_commit: 7e8a30829c9ac3a02b8247671391385ca74a63bd
+    training_script: scripts/train.py
+    trainer_module: src/dengue_mlops/modeling/trainer.py
+    orchestrator_stage: train_model (dvc.yaml)
+promotion:
+  workflow: 'None -> Staging -> Production (gate: minimum validation MAE)'
+  transitions:
+  - timestamp: '2026-11-02T03:22:23.035710+00:00'
+    model_name: DengueOutbreakForecaster
+    version: '4'
+    from_stage: Archived
+    to_stage: Staging
+    archive_existing: false
+    reason: Promoted to Staging for LK-07 gate validation; champion artifact from
+      the LK-06 experiment suite (5 tracked registry versions).
+    actor: scripts/registry_lifecycle.py (LK-07)
+  - timestamp: '2026-11-02T03:22:23.044447+00:00'
+    model_name: DengueOutbreakForecaster
+    version: '5'
+    from_stage: Production
+    to_stage: Staging
+    archive_existing: false
+    reason: 'Promoted to Staging: LK-07 challenger retrained with modified hyperparameters
+      (ridge_weight 0.65, sub_ridge_alpha 0.75, epochs 650); awaiting holdout-test
+      comparison against the incumbent.'
+    actor: scripts/registry_lifecycle.py (LK-07)
+  - timestamp: '2026-11-02T03:22:23.054415+00:00'
+    model_name: DengueOutbreakForecaster
+    version: '5'
+    from_stage: Staging
+    to_stage: Production
+    archive_existing: true
+    reason: 'Gate PASSED: challenger outperformed the incumbent on validation MAE
+      (and holdout test). Promoted to Production per selection criterion.'
+    actor: scripts/registry_lifecycle.py (LK-07)
+  - timestamp: '2026-11-02T03:22:23.143748+00:00'
+    model_name: DengueOutbreakForecaster
+    version: '4'
+    from_stage: Staging
+    to_stage: Archived
+    archive_existing: false
+    reason: Incumbent version superseded by the LK-07 challenger on the validation-MAE
+      gate; archived to preserve audit history while freeing the Production slot.
+    actor: scripts/registry_lifecycle.py (LK-07)
+  rationale: 'Version v5 (gradient_ensemble_regressor) dipilih sebagai Production
+    karena mengungguli model pembanding (v4) pada Validation MAE (16.425 vs 16.576)
+    dan Holdout-Test MAE (14.215 vs 14.469) dengan Test R2 0.9665. Kriteria seleksi
+    mengikuti kaidah MLOps industri: evaluasi temporal bebas leakage, akurasi prediksi
+    tertinggi, dan penurunan error kasus mingguan yang konsisten.'
+inference:
+  python_model: mlflow.pyfunc (DengueMLflowWrapper)
+  programmatic_load: mlflow.pyfunc.load_model("models:/DengueOutbreakForecaster/Production")
+  alias_load: mlflow.pyfunc.load_model("models:/DengueOutbreakForecaster@production")
+  verifier: scripts/verify_inference.py
+  verification_report: models/registry/inference_verification.json
+deployment:
+  serving_framework: FastAPI + Uvicorn
+  docker_image: indonesia-dengue-mlops/api:latest
+  registry_sync_files:
+  - models/registry/champion_metadata.json
+  - models/registry/model_metadata.json
