@@ -401,21 +401,21 @@ Pemilihan **Version 5 (v5)** menggantikan Version 4 (v4) didasarkan pada prinsip
    * **Holdout-Test MAE:** Pada partisi uji *unseen future data*, Version 5 mencatatkan MAE **14.215 kasus** dibandingkan Version 4 (**14.469 kasus**), memberikan reduksi error absolut sebesar **0.254 kasus**.
    * **Koefisien Determinasi (R²):** Version 5 menghasilkan Test R² sebesar **0.9665** (vs 0.9664 pada v4), jauh melampaui ambang batas minimal SLA produksi ($R^2 \ge 0.80$).
 2. **Justifikasi Penyetelan Hyperparameter (Challenger Tuning):**
-   * Peningkatan bobot lag autoregresif ($30\% \rightarrow 35\%$) memungkinkan model menangkap dinamika penularan DBD jangka pendek secara lebih adaptif.
-   * Penguatan regularisasi Ridge sub-model ($\alpha = 0.50 \rightarrow 0.75$, $\text{epochs} = 600 \rightarrow 650$) berhasil meredam fluktuasi kovariat iklim ekstrem (curah hujan dan kelembapan) sehingga mencegah *overfitting* pada provinsi dengan lonjakan anomali tinggi.
+   * Peningkatan bobot lag autoregresif (30% -> 35%) memungkinkan model menangkap dinamika penularan DBD jangka pendek secara lebih adaptif.
+   * Penguatan regularisasi Ridge sub-model (alpha = 0.50 -> 0.75, epochs = 600 -> 650) berhasil meredam fluktuasi kovariat iklim ekstrem (curah hujan dan kelembapan) sehingga mencegah *overfitting* pada provinsi dengan lonjakan anomali tinggi.
 3. **Pemberian Status Stage & Pengarsipan Aman:**
-   * Melalui alur `None → Staging → Production`, Version 5 dinyatakan memenangkan gerbang evaluasi (*Gate PASSED*).
+   * Melalui alur `None -> Staging -> Production`, Version 5 dinyatakan memenangkan gerbang evaluasi (*Gate PASSED*).
    * Version 4 secara otomatis dialihkan ke status `Archived` untuk mencegah duplikasi stage aktif, namun riwayat bobot dan parameternya tetap tersimpan untuk audit masa depan.
 
 ### 3. Tabel Riwayat Versi & Alur Transisi Stage
 
 | Versi | MLflow Run Name | Hyperparameters | Val MAE | Test MAE | Test R² | Stage | Status Keputusan |
-| :---: | :--- | :--- | :---: | :---: | :---: | :--- | :---: | :--- |
-| **v1** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, α=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Eksperimen Awal |
-| **v2** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, α=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Iterasi Pipeline |
-| **v3** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, α=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Kandidat LK-06 |
-| **v4** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, α=0.5 (Seed 42) | 16.58 | 14.47 | 0.9664 | `Archived` | LK-06 Incumbent (Digantikan v5) |
-| **v5** | `run_07_lk7_challenger_tuned` | Ridge=0.65, Lag=0.35, α=0.75, Ep=650 | **16.43** | **14.21** | **0.9665** | **`Production`** | **CHAMPION AKTIF (Dipromosikan)** |
+| :---: | :--- | :--- | :---: | :---: | :---: | :---: | :--- |
+| **v1** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, alpha=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Eksperimen Awal |
+| **v2** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, alpha=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Iterasi Pipeline |
+| **v3** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, alpha=0.5 | 16.36 | 13.75 | 0.9658 | `None` | Kandidat LK-06 |
+| **v4** | `run_05_gradient_ensemble` | Ridge=0.70, Lag=0.30, alpha=0.5 (Seed 42) | 16.58 | 14.47 | 0.9664 | `Archived` | LK-06 Incumbent (Digantikan v5) |
+| **v5** | `run_07_lk7_challenger_tuned` | Ridge=0.65, Lag=0.35, alpha=0.75, Ep=650 | **16.43** | **14.21** | **0.9665** | **`Production`** | **CHAMPION AKTIF (Dipromosikan)** |
 
 ### 4. Sinkronisasi Silsilah Data (Data Lineage) dengan DVC
 
