@@ -77,6 +77,8 @@ models/registry/*
 
 !models/checkpoints/.gitkeep
 !models/registry/.gitkeep
+!models/registry/champion_metadata.json
+!models/registry/model_metadata.json
 
 # Experiment tracking
 mlruns/
