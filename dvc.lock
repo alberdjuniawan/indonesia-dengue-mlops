@@ -1,0 +1,50 @@
+schema: '2.0'
+stages:
+  train_model:
+    cmd: python scripts/train.py --version 1.0.0 --device auto
+    deps:
+    - path: data/features/features.csv
+      hash: md5
+      md5: 77fc5bbd9110953d24ab73f8c935e92f
+      size: 607737
+    - path: scripts/train.py
+      hash: md5
+      md5: eb49a5873523ac041afcda6b50cd5ba3
+      size: 22716
+    - path: src/dengue_mlops/modeling/models.py
+      hash: md5
+      md5: 097488b8e81130d717cc8cd8779ed928
+      size: 16865
+    - path: src/dengue_mlops/modeling/trainer.py
+      hash: md5
+      md5: df5f3d450d5edc19f68949a81b61c0fa
+      size: 3836
+    outs:
+    - path: models/registry/champion_model.json
+      hash: md5
+      md5: 49d24c94f64ad22fa0c2e7682cc56dad
+      size: 2751
+    - path: models/training_report.json
+      hash: md5
+      md5: 8a23d4bb4ce3d9e90468cc9b557a825e
+      size: 641
+  evaluate_model:
+    cmd: python scripts/evaluate.py
+    deps:
+    - path: data/features/features.csv
+      hash: md5
+      md5: 77fc5bbd9110953d24ab73f8c935e92f
+      size: 607737
+    - path: models/registry/champion_model.json
+      hash: md5
+      md5: 49d24c94f64ad22fa0c2e7682cc56dad
+      size: 2751
+    - path: scripts/evaluate.py
+      hash: md5
+      md5: fb9f3acfd6561a0a2aad4a313972b7ba
+      size: 2312
+    outs:
+    - path: models/evaluation_report.json
+      hash: md5
+      md5: 3b9673533c459761294e063840f6f2ab
+      size: 4432

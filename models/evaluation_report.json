@@ -1,0 +1,241 @@
+{
+  "model_name": "gradient_ensemble_regressor",
+  "version": "3",
+  "test_sample_count": 1406,
+  "overall_metrics": {
+    "rmse": 29.149,
+    "mae": 13.752,
+    "r2": 0.9658,
+    "wape": 14.06
+  },
+  "province_metrics": {
+    "ACEH": {
+      "rmse": 7.795,
+      "mae": 6.185,
+      "r2": 0.6678,
+      "wape": 16.06
+    },
+    "BALI": {
+      "rmse": 17.176,
+      "mae": 13.921,
+      "r2": 0.8626,
+      "wape": 11.35
+    },
+    "BANGKA BELITUNG": {
+      "rmse": 8.324,
+      "mae": 7.063,
+      "r2": -0.3777,
+      "wape": 35.17
+    },
+    "BANTEN": {
+      "rmse": 25.483,
+      "mae": 19.782,
+      "r2": 0.8576,
+      "wape": 10.41
+    },
+    "BENGKULU": {
+      "rmse": 7.777,
+      "mae": 6.719,
+      "r2": 0.0018,
+      "wape": 30.62
+    },
+    "DI YOGYAKARTA": {
+      "rmse": 10.633,
+      "mae": 8.586,
+      "r2": 0.8778,
+      "wape": 10.3
+    },
+    "GORONTALO": {
+      "rmse": 7.564,
+      "mae": 6.444,
+      "r2": -1.0491,
+      "wape": 42.88
+    },
+    "JAKARTA": {
+      "rmse": 43.513,
+      "mae": 36.275,
+      "r2": 0.7825,
+      "wape": 13.26
+    },
+    "JAMBI": {
+      "rmse": 7.013,
+      "mae": 5.26,
+      "r2": 0.8349,
+      "wape": 11.59
+    },
+    "JAWA BARAT": {
+      "rmse": 112.039,
+      "mae": 85.858,
+      "r2": 0.7683,
+      "wape": 12.95
+    },
+    "JAWA TENGAH": {
+      "rmse": 76.889,
+      "mae": 57.864,
+      "r2": 0.7591,
+      "wape": 13.59
+    },
+    "JAWA TIMUR": {
+      "rmse": 84.068,
+      "mae": 63.875,
+      "r2": 0.8023,
+      "wape": 12.03
+    },
+    "KALIMANTAN BARAT": {
+      "rmse": 11.189,
+      "mae": 8.412,
+      "r2": 0.8187,
+      "wape": 10.99
+    },
+    "KALIMANTAN SELATAN": {
+      "rmse": 8.363,
+      "mae": 6.216,
+      "r2": 0.8245,
+      "wape": 10.94
+    },
+    "KALIMANTAN TENGAH": {
+      "rmse": 7.406,
+      "mae": 4.871,
+      "r2": 0.7146,
+      "wape": 12.06
+    },
+    "KALIMANTAN TIMUR": {
+      "rmse": 14.06,
+      "mae": 10.569,
+      "r2": 0.7811,
+      "wape": 12.56
+    },
+    "KALIMANTAN UTARA": {
+      "rmse": 8.053,
+      "mae": 6.856,
+      "r2": -3.0513,
+      "wape": 67.65
+    },
+    "KEPULAUAN RIAU": {
+      "rmse": 7.646,
+      "mae": 6.106,
+      "r2": 0.4013,
+      "wape": 23.98
+    },
+    "LAMPUNG": {
+      "rmse": 13.172,
+      "mae": 10.45,
+      "r2": 0.8606,
+      "wape": 10.49
+    },
+    "MALUKU": {
+      "rmse": 6.917,
+      "mae": 6.03,
+      "r2": -0.412,
+      "wape": 37.43
+    },
+    "MALUKU UTARA": {
+      "rmse": 7.622,
+      "mae": 6.481,
+      "r2": -1.483,
+      "wape": 53.17
+    },
+    "NUSA TENGGARA BARAT": {
+      "rmse": 7.278,
+      "mae": 5.751,
+      "r2": 0.8677,
+      "wape": 9.53
+    },
+    "NUSA TENGGARA TIMUR": {
+      "rmse": 11.431,
+      "mae": 8.471,
+      "r2": 0.7856,
+      "wape": 12.85
+    },
+    "PAPUA": {
+      "rmse": 8.555,
+      "mae": 7.294,
+      "r2": -0.5001,
+      "wape": 39.57
+    },
+    "PAPUA BARAT": {
+      "rmse": 7.329,
+      "mae": 6.064,
+      "r2": -6.6954,
+      "wape": 84.03
+    },
+    "PAPUA BARAT DAYA": {
+      "rmse": 7.746,
+      "mae": 6.549,
+      "r2": -7.0792,
+      "wape": 81.04
+    },
+    "PAPUA PEGUNUNGAN": {
+      "rmse": 6.455,
+      "mae": 5.519,
+      "r2": -4.4689,
+      "wape": 68.52
+    },
+    "PAPUA SELATAN": {
+      "rmse": 7.333,
+      "mae": 6.002,
+      "r2": -8.6235,
+      "wape": 98.69
+    },
+    "PAPUA TENGAH": {
+      "rmse": 6.317,
+      "mae": 5.322,
+      "r2": -2.5194,
+      "wape": 59.85
+    },
+    "RIAU": {
+      "rmse": 13.227,
+      "mae": 9.415,
+      "r2": 0.838,
+      "wape": 9.96
+    },
+    "SULAWESI BARAT": {
+      "rmse": 6.972,
+      "mae": 6.121,
+      "r2": -0.7396,
+      "wape": 43.72
+    },
+    "SULAWESI SELATAN": {
+      "rmse": 9.709,
+      "mae": 7.99,
+      "r2": 0.9194,
+      "wape": 8.93
+    },
+    "SULAWESI TENGAH": {
+      "rmse": 7.482,
+      "mae": 6.02,
+      "r2": 0.4887,
+      "wape": 19.91
+    },
+    "SULAWESI TENGGARA": {
+      "rmse": 6.917,
+      "mae": 5.594,
+      "r2": 0.4945,
+      "wape": 19.94
+    },
+    "SULAWESI UTARA": {
+      "rmse": 8.526,
+      "mae": 6.711,
+      "r2": 0.542,
+      "wape": 19.86
+    },
+    "SUMATERA BARAT": {
+      "rmse": 10.097,
+      "mae": 6.865,
+      "r2": 0.8346,
+      "wape": 9.78
+    },
+    "SUMATERA SELATAN": {
+      "rmse": 20.535,
+      "mae": 15.735,
+      "r2": 0.7008,
+      "wape": 14.5
+    },
+    "SUMATERA UTARA": {
+      "rmse": 33.666,
+      "mae": 23.316,
+      "r2": 0.8371,
+      "wape": 10.89
+    }
+  }
+}

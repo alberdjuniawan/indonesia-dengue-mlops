@@ -1,0 +1,16 @@
+{
+  "model_name": "baseline_lag_1",
+  "version": "1.0.0",
+  "promoted_at": "2026-10-19T17:03:44.847587+00:00",
+  "metrics": {
+    "rmse": 10.0,
+    "mae": 8.0,
+    "r2": 0.95
+  },
+  "feature_count": 1,
+  "features": [
+    "cases_lag_1"
+  ],
+  "description": "Production Dengue Forecast Model",
+  "status": "CHAMPION"
+}

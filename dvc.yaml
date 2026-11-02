@@ -1,0 +1,76 @@
+stages:
+  ingest_boundaries:
+    cmd: python scripts/download_boundaries.py
+    deps:
+      - scripts/download_boundaries.py
+    outs:
+      - data/raw/boundaries/indonesia_provinces.geojson
+
+  ingest_population:
+    cmd: python scripts/fetch_population.py
+    deps:
+      - scripts/fetch_population.py
+      - data/raw/population/bps
+    outs:
+      - data/processed/population.csv
+
+  ingest_dengue:
+    cmd: python scripts/generate_dengue_data.py
+    deps:
+      - scripts/generate_dengue_data.py
+    outs:
+      - data/processed/dengue.csv
+
+  ingest_weather:
+    cmd: python scripts/generate_weather_data.py
+    deps:
+      - scripts/generate_weather_data.py
+      - data/processed/dengue.csv
+    outs:
+      - data/processed/weather_weekly.csv
+
+  generate_interim:
+    cmd: python scripts/populate_full_raw_and_interim.py
+    deps:
+      - scripts/populate_full_raw_and_interim.py
+      - data/processed/dengue.csv
+      - data/processed/weather_weekly.csv
+      - data/processed/population.csv
+    outs:
+      - data/interim/merged_master_interim.csv
+      - data/interim/skdr_standardized.csv
+      - data/interim/population_standardized.csv
+
+  engineer_features:
+    cmd: python scripts/build_features.py
+    deps:
+      - scripts/build_features.py
+      - src/dengue_mlops/features/pipeline.py
+      - data/processed/dengue.csv
+      - data/processed/population.csv
+      - data/processed/weather_weekly.csv
+    outs:
+      - data/features/features.csv
+
+  train_model:
+    cmd: python scripts/train.py --version 1.0.0 --device auto
+    deps:
+      - scripts/train.py
+      - src/dengue_mlops/modeling/trainer.py
+      - src/dengue_mlops/modeling/models.py
+      - data/features/features.csv
+    outs:
+      - models/registry/champion_model.json
+    metrics:
+      - models/training_report.json:
+          cache: false
+
+  evaluate_model:
+    cmd: python scripts/evaluate.py
+    deps:
+      - scripts/evaluate.py
+      - models/registry/champion_model.json
+      - data/features/features.csv
+    metrics:
+      - models/evaluation_report.json:
+          cache: false
