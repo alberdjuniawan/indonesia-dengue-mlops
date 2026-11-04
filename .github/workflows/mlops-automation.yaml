@@ -1,0 +1,143 @@
+name: MLOps End-to-End Pipeline Automation (LK-08)
+
+on:
+  push:
+    branches:
+      - main
+      - feat/pipeline-automation
+      - 'feat/**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      force_retrain:
+        description: 'Force full retrain regardless of cache'
+        required: false
+        default: 'true'
+        type: boolean
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: "Tahap 1: Automated Testing & Code Integrity"
+    runs-on: [self-hosted]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv package manager
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run Ruff static analysis (linting)
+        run: uv run ruff check .
+
+      - name: Run Ruff code formatting check
+        run: uv run ruff format --check .
+
+      - name: Run Pytest test suite
+        run: uv run pytest -v --durations=10
+
+  pipeline:
+    name: "Tahap 2-4: Training, Quality Gate & Staging Registry"
+    needs: test
+    runs-on: [self-hosted]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up uv package manager
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Prepare DVC-versioned dataset
+        run: |
+          echo "========================================================"
+          echo "DVC Data Verification & Lineage Synchronization"
+          echo "========================================================"
+          uv run dvc pull --force || echo "DVC remote pull skipped / using local cache"
+
+          if [ ! -f "data/features/features.csv" ]; then
+            echo "Building features from DVC processed data..."
+            uv run python scripts/build_features.py
+          fi
+          echo "Dataset verified: $(wc -l < data/features/features.csv) samples ready."
+
+      - name: "Tahap 2: Automated Training (LK-06)"
+        run: |
+          echo "========================================================"
+          echo "Starting Automated Model Training (train.py)"
+          echo "========================================================"
+          uv run python train.py --experiment-name dengue-weekly-forecasting --device cpu
+
+      - name: "Tahap 3 & 4: Model Evaluation, Quality Gate & Staging Registry Promotion"
+        run: |
+          echo "========================================================"
+          echo "Evaluating Model & Validating against SLA Thresholds"
+          echo "========================================================"
+          uv run python scripts/evaluate.py --validate --promote-staging --min-r2 0.80 --max-mae 25.0
+
+      - name: Generate Workflow Summary
+        if: always()
+        run: |
+          echo "## 🚀 MLOps Pipeline Automation Execution Report (LK-08)" >> $GITHUB_STEP_SUMMARY
+          echo "**Trigger Source:** \`${{ github.event_name }}\` on ref \`${{ github.ref }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit SHA:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Runner Host:** Host beto (\`self-hosted\`)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f "models/evaluation_report.json" ]; then
+            echo "### 📊 Quality Gate & Evaluation Summary" >> $GITHUB_STEP_SUMMARY
+            uv run python -c "
+          import json
+          report = json.loads(open('models/evaluation_report.json').read())
+          metrics = report.get('overall_metrics', {})
+          gate = report.get('quality_gate', {})
+          status = gate.get('status', 'UNKNOWN')
+          badge = '✅ PASSED' if status == 'PASSED' else '❌ FAILED'
+          print(f'| Metric | Actual Value | SLA Threshold | Status |')
+          print(f'| :--- | :---: | :---: | :---: |')
+          print(f'| **R² Score** | {metrics.get(\"r2\", 0):.4f} | $\ge 0.80$ | {\"✅\" if metrics.get(\"r2\", 0) >= 0.80 else \"❌\"} |')
+          print(f'| **MAE** | {metrics.get(\"mae\", 0):.2f} | $\le 25.0$ | {\"✅\" if metrics.get(\"mae\", 0) <= 25.0 else \"❌\"} |')
+          print(f'| **RMSE** | {metrics.get(\"rmse\", 0):.2f} | $\le 45.0$ | {\"✅\" if metrics.get(\"rmse\", 0) <= 45.0 else \"❌\"} |')
+          print(f'| **WAPE** | {metrics.get(\"wape\", 0):.2f}% | $\le 25.0\%$ | {\"✅\" if metrics.get(\"wape\", 0) <= 25.0 else \"❌\"} |')
+          print(f'\n**Overall Quality Gate:** {badge}')
+          reg = report.get('registry_promotion', {})
+          if reg:
+              print(f'\n### 🏷️ MLflow Model Registry Update')
+              print(f'- **Registered Model:** \`{reg.get(\"model_name\")}\`')
+              print(f'- **Promoted Version:** \`v{reg.get(\"promoted_version\")}\`')
+              print(f'- **Target Stage:** \`{reg.get(\"target_stage\")}\`')
+              print(f'- **Assigned Alias:** \`@{reg.get(\"alias\")}\`')
+          " >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Archive Pipeline Artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mlops-automation-artifacts
+          path: |
+            models/evaluation_report.json
+            models/training_report.json
+            models/registry/champion_metadata.json
+            models/registry/stage_transition_log.json
+          retention-days: 14
