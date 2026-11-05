@@ -1,241 +1,275 @@
 {
-  "model_name": "gradient_ensemble_regressor",
-  "version": "3",
+  "model_name": "baseline_lag_1",
+  "version": "1.0.0",
   "test_sample_count": 1406,
   "overall_metrics": {
-    "rmse": 29.149,
-    "mae": 13.752,
-    "r2": 0.9658,
-    "wape": 14.06
+    "rmse": 33.407,
+    "mae": 14.467,
+    "r2": 0.9568,
+    "wape": 14.66
   },
   "province_metrics": {
     "ACEH": {
-      "rmse": 7.795,
-      "mae": 6.185,
-      "r2": 0.6678,
-      "wape": 16.06
+      "rmse": 6.127,
+      "mae": 5.054,
+      "r2": 0.8157,
+      "wape": 12.37
     },
     "BALI": {
-      "rmse": 17.176,
-      "mae": 13.921,
-      "r2": 0.8626,
-      "wape": 11.35
+      "rmse": 20.047,
+      "mae": 15.243,
+      "r2": 0.8054,
+      "wape": 12.6
     },
     "BANGKA BELITUNG": {
-      "rmse": 8.324,
-      "mae": 7.063,
-      "r2": -0.3777,
-      "wape": 35.17
+      "rmse": 3.568,
+      "mae": 2.676,
+      "r2": 0.7296,
+      "wape": 13.45
     },
     "BANTEN": {
-      "rmse": 25.483,
-      "mae": 19.782,
-      "r2": 0.8576,
-      "wape": 10.41
+      "rmse": 31.088,
+      "mae": 22.622,
+      "r2": 0.7757,
+      "wape": 11.95
     },
     "BENGKULU": {
-      "rmse": 7.777,
-      "mae": 6.719,
-      "r2": 0.0018,
-      "wape": 30.62
+      "rmse": 4.408,
+      "mae": 3.486,
+      "r2": 0.7098,
+      "wape": 15.66
     },
     "DI YOGYAKARTA": {
-      "rmse": 10.633,
-      "mae": 8.586,
-      "r2": 0.8778,
-      "wape": 10.3
+      "rmse": 15.127,
+      "mae": 11.757,
+      "r2": 0.7093,
+      "wape": 14.81
     },
     "GORONTALO": {
-      "rmse": 7.564,
-      "mae": 6.444,
-      "r2": -1.0491,
-      "wape": 42.88
+      "rmse": 2.696,
+      "mae": 2.027,
+      "r2": 0.7557,
+      "wape": 13.49
     },
     "JAKARTA": {
-      "rmse": 43.513,
-      "mae": 36.275,
-      "r2": 0.7825,
-      "wape": 13.26
+      "rmse": 55.347,
+      "mae": 43.432,
+      "r2": 0.7063,
+      "wape": 15.31
     },
     "JAMBI": {
-      "rmse": 7.013,
-      "mae": 5.26,
-      "r2": 0.8349,
-      "wape": 11.59
+      "rmse": 8.569,
+      "mae": 6.514,
+      "r2": 0.6559,
+      "wape": 14.8
     },
     "JAWA BARAT": {
-      "rmse": 112.039,
-      "mae": 85.858,
-      "r2": 0.7683,
-      "wape": 12.95
+      "rmse": 115.404,
+      "mae": 93.459,
+      "r2": 0.7736,
+      "wape": 14.09
     },
     "JAWA TENGAH": {
-      "rmse": 76.889,
-      "mae": 57.864,
-      "r2": 0.7591,
-      "wape": 13.59
+      "rmse": 77.074,
+      "mae": 63.405,
+      "r2": 0.7816,
+      "wape": 14.37
     },
     "JAWA TIMUR": {
-      "rmse": 84.068,
-      "mae": 63.875,
-      "r2": 0.8023,
-      "wape": 12.03
+      "rmse": 115.497,
+      "mae": 84.649,
+      "r2": 0.6685,
+      "wape": 15.65
     },
     "KALIMANTAN BARAT": {
-      "rmse": 11.189,
-      "mae": 8.412,
-      "r2": 0.8187,
-      "wape": 10.99
+      "rmse": 15.69,
+      "mae": 11.568,
+      "r2": 0.6735,
+      "wape": 15.32
     },
     "KALIMANTAN SELATAN": {
-      "rmse": 8.363,
-      "mae": 6.216,
-      "r2": 0.8245,
-      "wape": 10.94
+      "rmse": 9.246,
+      "mae": 7.054,
+      "r2": 0.8051,
+      "wape": 12.91
     },
     "KALIMANTAN TENGAH": {
-      "rmse": 7.406,
-      "mae": 4.871,
-      "r2": 0.7146,
-      "wape": 12.06
+      "rmse": 8.481,
+      "mae": 6.622,
+      "r2": 0.6643,
+      "wape": 15.75
     },
     "KALIMANTAN TIMUR": {
-      "rmse": 14.06,
-      "mae": 10.569,
-      "r2": 0.7811,
-      "wape": 12.56
+      "rmse": 16.221,
+      "mae": 12.595,
+      "r2": 0.6539,
+      "wape": 15.17
     },
     "KALIMANTAN UTARA": {
-      "rmse": 8.053,
-      "mae": 6.856,
-      "r2": -3.0513,
-      "wape": 67.65
+      "rmse": 1.685,
+      "mae": 1.324,
+      "r2": 0.7995,
+      "wape": 12.86
     },
     "KEPULAUAN RIAU": {
-      "rmse": 7.646,
-      "mae": 6.106,
-      "r2": 0.4013,
-      "wape": 23.98
+      "rmse": 3.665,
+      "mae": 2.73,
+      "r2": 0.8148,
+      "wape": 11.05
     },
     "LAMPUNG": {
-      "rmse": 13.172,
-      "mae": 10.45,
-      "r2": 0.8606,
-      "wape": 10.49
+      "rmse": 21.793,
+      "mae": 16.838,
+      "r2": 0.5982,
+      "wape": 16.98
     },
     "MALUKU": {
-      "rmse": 6.917,
-      "mae": 6.03,
-      "r2": -0.412,
-      "wape": 37.43
+      "rmse": 2.824,
+      "mae": 2.405,
+      "r2": 0.7592,
+      "wape": 14.88
     },
     "MALUKU UTARA": {
-      "rmse": 7.622,
-      "mae": 6.481,
-      "r2": -1.483,
-      "wape": 53.17
+      "rmse": 1.636,
+      "mae": 1.27,
+      "r2": 0.8324,
+      "wape": 10.93
     },
     "NUSA TENGGARA BARAT": {
-      "rmse": 7.278,
-      "mae": 5.751,
-      "r2": 0.8677,
-      "wape": 9.53
+      "rmse": 8.713,
+      "mae": 6.946,
+      "r2": 0.8287,
+      "wape": 11.58
     },
     "NUSA TENGGARA TIMUR": {
-      "rmse": 11.431,
-      "mae": 8.471,
-      "r2": 0.7856,
-      "wape": 12.85
+      "rmse": 9.965,
+      "mae": 7.568,
+      "r2": 0.8252,
+      "wape": 11.78
     },
     "PAPUA": {
-      "rmse": 8.555,
-      "mae": 7.294,
-      "r2": -0.5001,
-      "wape": 39.57
+      "rmse": 4.087,
+      "mae": 3.081,
+      "r2": 0.6116,
+      "wape": 16.96
     },
     "PAPUA BARAT": {
-      "rmse": 7.329,
-      "mae": 6.064,
-      "r2": -6.6954,
-      "wape": 84.03
+      "rmse": 1.594,
+      "mae": 1.135,
+      "r2": 0.6444,
+      "wape": 15.91
     },
     "PAPUA BARAT DAYA": {
-      "rmse": 7.746,
-      "mae": 6.549,
-      "r2": -7.0792,
-      "wape": 81.04
+      "rmse": 1.816,
+      "mae": 1.351,
+      "r2": 0.5998,
+      "wape": 16.39
     },
     "PAPUA PEGUNUNGAN": {
-      "rmse": 6.455,
-      "mae": 5.519,
-      "r2": -4.4689,
-      "wape": 68.52
+      "rmse": 1.636,
+      "mae": 1.216,
+      "r2": 0.6866,
+      "wape": 15.31
     },
     "PAPUA SELATAN": {
-      "rmse": 7.333,
-      "mae": 6.002,
-      "r2": -8.6235,
-      "wape": 98.69
+      "rmse": 1.219,
+      "mae": 0.892,
+      "r2": 0.6569,
+      "wape": 15.21
     },
     "PAPUA TENGAH": {
-      "rmse": 6.317,
-      "mae": 5.322,
-      "r2": -2.5194,
-      "wape": 59.85
+      "rmse": 1.708,
+      "mae": 1.297,
+      "r2": 0.7346,
+      "wape": 14.37
     },
     "RIAU": {
-      "rmse": 13.227,
-      "mae": 9.415,
-      "r2": 0.838,
-      "wape": 9.96
+      "rmse": 16.633,
+      "mae": 13.027,
+      "r2": 0.7559,
+      "wape": 13.47
     },
     "SULAWESI BARAT": {
-      "rmse": 6.972,
-      "mae": 6.121,
-      "r2": -0.7396,
-      "wape": 43.72
+      "rmse": 3.337,
+      "mae": 2.595,
+      "r2": 0.5388,
+      "wape": 17.91
     },
     "SULAWESI SELATAN": {
-      "rmse": 9.709,
-      "mae": 7.99,
-      "r2": 0.9194,
-      "wape": 8.93
+      "rmse": 18.702,
+      "mae": 15.162,
+      "r2": 0.7016,
+      "wape": 16.66
     },
     "SULAWESI TENGAH": {
-      "rmse": 7.482,
-      "mae": 6.02,
-      "r2": 0.4887,
-      "wape": 19.91
+      "rmse": 4.22,
+      "mae": 3.432,
+      "r2": 0.8442,
+      "wape": 11.21
     },
     "SULAWESI TENGGARA": {
-      "rmse": 6.917,
-      "mae": 5.594,
-      "r2": 0.4945,
-      "wape": 19.94
+      "rmse": 6.049,
+      "mae": 4.324,
+      "r2": 0.6826,
+      "wape": 15.41
     },
     "SULAWESI UTARA": {
-      "rmse": 8.526,
-      "mae": 6.711,
-      "r2": 0.542,
-      "wape": 19.86
+      "rmse": 7.241,
+      "mae": 5.081,
+      "r2": 0.6869,
+      "wape": 14.37
     },
     "SUMATERA BARAT": {
-      "rmse": 10.097,
-      "mae": 6.865,
-      "r2": 0.8346,
-      "wape": 9.78
+      "rmse": 14.631,
+      "mae": 11.027,
+      "r2": 0.6349,
+      "wape": 15.99
     },
     "SUMATERA SELATAN": {
-      "rmse": 20.535,
-      "mae": 15.735,
-      "r2": 0.7008,
-      "wape": 14.5
+      "rmse": 24.455,
+      "mae": 19.189,
+      "r2": 0.6655,
+      "wape": 17.07
     },
     "SUMATERA UTARA": {
-      "rmse": 33.666,
-      "mae": 23.316,
-      "r2": 0.8371,
-      "wape": 10.89
+      "rmse": 45.494,
+      "mae": 35.676,
+      "r2": 0.7194,
+      "wape": 16.66
     }
+  },
+  "quality_gate": {
+    "status": "FAILED",
+    "passed": false,
+    "evaluated_at": "2026-11-08T13:34:40.932358+00:00",
+    "checks": {
+      "r2": {
+        "threshold": 0.99,
+        "actual": 0.9568,
+        "operator": ">=",
+        "passed": false
+      },
+      "mae": {
+        "threshold": 25.0,
+        "actual": 14.467,
+        "operator": "<=",
+        "passed": true
+      },
+      "rmse": {
+        "threshold": 45.0,
+        "actual": 33.407,
+        "operator": "<=",
+        "passed": true
+      },
+      "wape": {
+        "threshold": 25.0,
+        "actual": 14.66,
+        "operator": "<=",
+        "passed": true
+      }
+    },
+    "failure_reasons": [
+      "R\u00b2 (0.9568) is below minimum threshold (0.9900)"
+    ]
   }
 }
