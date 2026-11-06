@@ -13,10 +13,13 @@ from dengue_mlops.modeling.registry import (
     DEFAULT_MAX_WAPE,
     DEFAULT_MIN_R2,
     load_champion,
+    promote_to_staging,
     validate_model_metrics,
 )
 
 DEFAULT_EVALUATION_REPORT = Path("models/evaluation_report.json")
+DEFAULT_TRACKING_URI = "sqlite:///mlflow.db"
+DEFAULT_MODEL_NAME = "DengueOutbreakForecaster"
 
 
 def main() -> None:
@@ -70,6 +73,24 @@ def main() -> None:
         type=float,
         default=DEFAULT_MAX_WAPE,
         help=f"Maximum acceptable WAPE percentage (default: {DEFAULT_MAX_WAPE}%)",
+    )
+    parser.add_argument(
+        "--promote-staging",
+        action="store_true",
+        default=False,
+        help="Automatically promote validated model to MLflow Model Registry 'Staging' stage",
+    )
+    parser.add_argument(
+        "--tracking-uri",
+        type=str,
+        default=DEFAULT_TRACKING_URI,
+        help=f"MLflow Tracking URI (default: {DEFAULT_TRACKING_URI})",
+    )
+    parser.add_argument(
+        "--model-name",
+        type=str,
+        default=DEFAULT_MODEL_NAME,
+        help=f"MLflow Registered Model Name (default: {DEFAULT_MODEL_NAME})",
     )
     args = parser.parse_args()
 
@@ -141,6 +162,53 @@ def main() -> None:
             print("\n❌ Quality Gate Validation FAILED:")
             for reason in validation_result["failure_reasons"]:
                 print(f"  - {reason}")
+
+    # Tahap 4: Auto-Registry Promotion to Staging
+    if args.promote_staging:
+        if args.validate and validation_result and not validation_result["passed"]:
+            print("\n❌ Quality gate validation failed. Staging promotion ABORTED.")
+            args.output.parent.mkdir(parents=True, exist_ok=True)
+            args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")
+            sys.exit(1)
+
+        print("\n" + "=" * 65)
+        print("MLFLOW MODEL REGISTRY PROMOTION TO STAGING (TAHAP 4)")
+        print("=" * 65)
+
+        # Determine target version: read champion_metadata if exists or fallback to metadata version
+        target_version = metadata.get("version", "1")
+        champion_meta_path = Path("models/registry/champion_metadata.json")
+        if champion_meta_path.exists():
+            try:
+                cm = json.loads(champion_meta_path.read_text(encoding="utf-8"))
+                target_version = cm.get("mlflow_model_version", target_version)
+            except (FileNotFoundError, json.JSONDecodeError, KeyError):
+                target_version = metadata.get("version", "1")
+
+        try:
+            promotion_result = promote_to_staging(
+                model_name=args.model_name,
+                version=target_version,
+                tracking_uri=args.tracking_uri,
+                metrics=metrics,
+                reason=(
+                    f"Automated Quality Gate PASSED: R2={metrics['r2']:.4f} >= {args.min_r2}, "
+                    f"MAE={metrics['mae']:.2f} <= {args.max_mae}. Promoted to Staging via CI/CD (LK-08)."
+                ),
+            )
+            report["registry_promotion"] = promotion_result
+            print(f"Model Name       : {promotion_result['model_name']}")
+            print(f"Promoted Version : v{promotion_result['promoted_version']}")
+            print(f"Previous Stage   : {promotion_result['previous_stage']}")
+            print(f"Target Stage     : {promotion_result['target_stage']}")
+            print(f"Registry Alias   : @{promotion_result['alias']}")
+            print(f"Promoted By      : {promotion_result['actor']}")
+            print("=" * 65)
+        except Exception as e:  # noqa: BLE001
+            print(f"⚠️ Error promoting model to MLflow Model Registry: {e}")
+            report["registry_promotion_error"] = str(e)
+            if args.validate and validation_result and validation_result["passed"]:
+                print("Notice: Proceeding with evaluation report output despite registry error.")
 
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2), encoding="utf-8")

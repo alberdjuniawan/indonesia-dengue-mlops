@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import warnings
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -156,4 +157,97 @@ def validate_model_metrics(
             },
         },
         "failure_reasons": failure_reasons,
+    }
+
+
+def promote_to_staging(
+    model_name: str,
+    version: str | int,
+    tracking_uri: str = "sqlite:///mlflow.db",
+    reason: str = "Promoted to Staging via automated quality gate validation (LK-08)",
+    actor: str = "GitHub Actions (mlops-automation.yaml) on Host beto",
+    metrics: dict[str, float] | None = None,
+    log_file: Path = STAGE_TRANSITION_LOG_FILE,
+) -> dict[str, Any]:
+    """Transition a validated model version to 'Staging' in MLflow Model Registry.
+
+    Applies the industrial dual-registration pattern:
+    1. Transitions model stage to 'Staging' via transition_model_version_stage.
+    2. Sets registered model alias '@staging' pointing directly to this version.
+    3. Attaches quality gate audit metadata and verification tags.
+    4. Records the automated audit event in models/registry/stage_transition_log.json.
+    """
+    from mlflow.tracking import MlflowClient
+
+    client = MlflowClient(tracking_uri=tracking_uri)
+    target_version_str = str(version)
+
+    # 1. Inspect existing version state
+    mv_before = client.get_model_version(name=model_name, version=target_version_str)
+    from_stage = getattr(mv_before, "current_stage", "None")
+
+    # 2. Transition stage to 'Staging'
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", FutureWarning)
+        mv_after = client.transition_model_version_stage(
+            name=model_name,
+            version=target_version_str,
+            stage="Staging",
+            archive_existing_versions=False,
+        )
+
+    # 3. Assign '@staging' alias
+    client.set_registered_model_alias(name=model_name, alias="staging", version=target_version_str)
+
+    # 4. Attach validation tags
+    now_iso = datetime.now(UTC).isoformat()
+    client.set_model_version_tag(model_name, target_version_str, "stage", "Staging")
+    client.set_model_version_tag(model_name, target_version_str, "quality_gate", "PASSED")
+    client.set_model_version_tag(model_name, target_version_str, "promoted_to_staging_at", now_iso)
+    client.set_model_version_tag(model_name, target_version_str, "promoted_by", actor)
+    if metrics:
+        client.set_model_version_tag(
+            model_name, target_version_str, "validation_mae", str(round(metrics.get("mae", 0.0), 3))
+        )
+        client.set_model_version_tag(
+            model_name, target_version_str, "validation_r2", str(round(metrics.get("r2", 0.0), 4))
+        )
+
+    # 5. Record transition log entry
+    transition_entry = {
+        "timestamp": now_iso,
+        "model_name": model_name,
+        "version": target_version_str,
+        "from_stage": from_stage,
+        "to_stage": getattr(mv_after, "current_stage", "Staging"),
+        "archive_existing": False,
+        "reason": reason,
+        "actor": actor,
+    }
+
+    log_data: dict[str, Any] = {}
+    if log_file.exists():
+        try:
+            log_data = json.loads(log_file.read_text(encoding="utf-8"))
+        except Exception:  # noqa: BLE001
+            log_data = {}
+
+    log_data.setdefault("generated_at", now_iso)
+    log_data["latest_staging_version"] = target_version_str
+    log_data["last_staging_promotion"] = now_iso
+    transitions_list = log_data.setdefault("transitions", [])
+    transitions_list.append(transition_entry)
+
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    log_file.write_text(json.dumps(log_data, indent=2), encoding="utf-8")
+
+    return {
+        "model_name": model_name,
+        "promoted_version": target_version_str,
+        "previous_stage": from_stage,
+        "target_stage": "Staging",
+        "alias": "staging",
+        "transition_timestamp": now_iso,
+        "actor": actor,
+        "reason": reason,
     }
