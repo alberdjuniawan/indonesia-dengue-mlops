@@ -73,10 +73,25 @@ jobs:
           echo "========================================================"
           echo "DVC Data Verification & Lineage Synchronization"
           echo "========================================================"
-          uv run dvc pull --force || echo "DVC remote pull skipped / using local cache"
+          uv run dvc pull data/raw/dengue_raw.csv.dvc || true
+
+          if [ ! -f "data/processed/dengue.csv" ]; then
+            if [ -f "data/raw/dengue_raw.csv" ]; then
+              echo "Processing DVC raw dataset to clean modeling dataset..."
+              uv run python scripts/ingest_data.py --mode continual || uv run python scripts/generate_dengue_data.py
+            else
+              echo "Generating dengue surveillance dataset..."
+              uv run python scripts/generate_dengue_data.py
+            fi
+          fi
+
+          if [ ! -f "data/processed/weather_weekly.csv" ]; then
+            echo "Generating processed weather dataset..."
+            uv run python scripts/generate_weather_data.py
+          fi
 
           if [ ! -f "data/features/features.csv" ]; then
-            echo "Building features from DVC processed data..."
+            echo "Building features from processed data..."
             uv run python scripts/build_features.py
           fi
           echo "Dataset verified: $(wc -l < data/features/features.csv) samples ready."

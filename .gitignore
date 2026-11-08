@@ -58,6 +58,7 @@ data/interim/*
 # Processed data
 data/processed/*
 !data/processed/.gitkeep
+!data/processed/population.csv
 !data/processed/*.dvc
 !data/processed/**/*.dvc
 !data/processed/.gitignore

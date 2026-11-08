@@ -1,9 +1,9 @@
 {
   "model_name": "DengueOutbreakForecaster",
-  "champion_run_id": "c559857441f3496798a1d2e78d8fc155",
+  "champion_run_id": "20e3a4f492ee464aad4df7e34d5acb3f",
   "champion_run_name": "run_05_gradient_ensemble",
   "model_family": "gradient_ensemble_regressor",
-  "mlflow_model_version": 6,
+  "mlflow_model_version": 7,
   "registered_alias": "champion",
   "dataset_version": "v2.0-data",
   "feature_count": 21,

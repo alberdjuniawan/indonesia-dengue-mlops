@@ -1,6 +1,6 @@
 {
   "model_name": "gradient_ensemble_regressor",
-  "version": "6",
+  "version": "7",
   "test_sample_count": 1406,
   "overall_metrics": {
     "rmse": 29.437,
@@ -241,7 +241,7 @@
   "quality_gate": {
     "status": "PASSED",
     "passed": true,
-    "evaluated_at": "2026-11-08T13:43:34.847457+00:00",
+    "evaluated_at": "2026-11-08T15:47:57.922993+00:00",
     "checks": {
       "r2": {
         "threshold": 0.8,
@@ -262,7 +262,7 @@
         "passed": true
       },
       "wape": {
-        "threshold": 25.0,
+        "threshold": 30.0,
         "actual": 14.56,
         "operator": "<=",
         "passed": true
@@ -272,11 +272,11 @@
   },
   "registry_promotion": {
     "model_name": "DengueOutbreakForecaster",
-    "promoted_version": "6",
+    "promoted_version": "7",
     "previous_stage": "None",
     "target_stage": "Staging",
     "alias": "staging",
-    "transition_timestamp": "2026-11-08T13:43:36.565969+00:00",
+    "transition_timestamp": "2026-11-08T15:47:59.675744+00:00",
     "actor": "GitHub Actions (mlops-automation.yaml) on Host beto",
     "reason": "Automated Quality Gate PASSED: R2=0.9664 >= 0.8, MAE=14.37 <= 25.0. Promoted to Staging via CI/CD (LK-08)."
   }

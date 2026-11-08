@@ -72,7 +72,7 @@ def main() -> None:
         "--max-wape",
         type=float,
         default=DEFAULT_MAX_WAPE,
-        help=f"Maximum acceptable WAPE percentage (default: {DEFAULT_MAX_WAPE}%)",
+        help=f"Maximum acceptable WAPE percentage (default: {DEFAULT_MAX_WAPE}%%)",
     )
     parser.add_argument(
         "--promote-staging",
