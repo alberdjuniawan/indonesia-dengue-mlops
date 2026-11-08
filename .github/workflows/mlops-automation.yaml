@@ -38,7 +38,7 @@ jobs:
         run: uv python install 3.12
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --dev
 
       - name: Run Ruff static analysis (linting)
         run: uv run ruff check .
@@ -66,7 +66,7 @@ jobs:
         run: uv python install 3.12
 
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync --dev
 
       - name: Prepare DVC-versioned dataset
         run: |
