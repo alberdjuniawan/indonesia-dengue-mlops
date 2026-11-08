@@ -459,6 +459,114 @@ uv run python scripts/verify_inference.py
 
 ---
 
+## Otomatisasi End-to-End Pipeline: Integrasi Pemicu Kode (LK-08)
+
+Implementasi prinsip utama MLOps **"Code as a Trigger"**: setiap perubahan kode program (seperti penyesuaian hyperparameter atau prapemrosesan) secara otomatis memicu seluruh alur kerja mulai dari pengujian unit, pelatihan ulang (*retraining*), evaluasi performa terhadap ambang batas SLA, hingga promosi model ke **MLflow Model Registry** dengan status **Staging**.
+
+```mermaid
+flowchart TD
+    A["Developer Commit / Push\n(Code as a Trigger)"] --> B["GitHub Actions Runner\n(Host beto)"]
+    
+    subgraph S1["Tahap 1: Automated Testing"]
+        B --> C1["Ruff Static Analysis & Linter"]
+        C1 --> C2["Pytest Unit Test Suite\n(Code & Quality Gate Integrity)"]
+    end
+
+    subgraph S2["Tahap 2: Automated Retraining"]
+        C2 --> D1["DVC Data Verification\n(v2.0-data Lineage)"]
+        D1 --> D2["Execute train.py\n(MLflow Multi-run Sweep)"]
+        D2 --> D3["MLflow Tracking & Artifact Logging\n(Select Champion Run)"]
+    end
+
+    subgraph S3["Tahap 3: Model Evaluation & Validation"]
+        D3 --> E1["Execute scripts/evaluate.py --validate"]
+        E1 --> E2{"SLA Quality Gate\nR² >= 0.80 & MAE <= 25.0?"}
+    end
+
+    subgraph S4["Tahap 4: Auto-Registry Staging Promotion"]
+        E2 -- "PASSED" --> F1["Promote to Staging in MLflow Registry"]
+        F1 --> F2["Assign Alias @staging"]
+        F2 --> F3["Update stage_transition_log.json & GitHub Step Summary"]
+        E2 -- "FAILED" --> G1["Quality Gate Rejection\n(Abort Promotion & Fail CI)"]
+    end
+```
+
+### 1. Definisi Alur Kerja GitHub Actions (`.github/workflows/mlops-automation.yaml`)
+
+Pipeline didefinisikan secara deklaratif dalam `.github/workflows/mlops-automation.yaml` dengan konfigurasi pemicu:
+* **Trigger Events:**
+  * `push`: pada branch `main` dan branch fitur `feat/pipeline-automation` / `feat/**`.
+  * `pull_request`: pada branch `main`.
+  * `workflow_dispatch`: pemicu manual untuk kebutuhan audit & ad-hoc execution.
+* **Runner Environment:** Dijalankan pada **Host beto** menggunakan GitHub Actions self-hosted runner (`runs-on: [self-hosted]`).
+
+### 2. Tahapan Alur Kerja Otomatisasi
+
+| Tahap | Komponen Eksekusi | Deskripsi & Validasi |
+| :--- | :--- | :--- |
+| **Tahap 1: Automated Testing** | `pytest -v`, `ruff check`, `ruff format --check` | Memverifikasi integritas sintaks, kepatuhan tipe, dan 61 test case unit/integrasi guna mencegah *silent code breakages*. |
+| **Tahap 2: Automated Training** | `uv run python train.py` | Menjalankan *training suite* multi-model LK-06 menggunakan data terkelola DVC (`v2.0-data`), mencatat parameter, metrik, artefak ke MLflow, dan memilih Champion. |
+| **Tahap 3: Model Evaluation & Validation** | `uv run python scripts/evaluate.py --validate` | Mengevaluasi model Champion pada data *holdout test* terhadap ambang batas performa (SLA) dari LK-01. |
+| **Tahap 4: Auto-Registry Update** | `uv run python scripts/evaluate.py --promote-staging` | Jika lolos evaluasi, model secara otomatis ditransisikan ke *stage* **`Staging`** di MLflow Model Registry dan diberi alias **`@staging`**. |
+
+### 3. Kriteria Validasi Otomatis (Quality Gate SLA Thresholds)
+
+Sesuai kriteria LK-01 dan standar produksi MLOps, model baru hanya berhak dipromosikan ke `Staging` apabila memenuhi seluruh ambang batas berikut:
+
+| Metrik Evaluasi | Operator | Ambang Batas (SLA) | Nilai Aktual Model | Status Kelulusan |
+| :--- | :---: | :---: | :---: | :---: |
+| **Koefisien Determinasi ($R^2$)** | $\ge$ | **$0.80$** | **$0.9568$ - $0.9665$** | ✅ **PASSED** |
+| **Mean Absolute Error ($\text{MAE}$)** | $\le$ | **$25.0$** | **$13.75$ - $14.47$** | ✅ **PASSED** |
+| **Root Mean Squared Error ($\text{RMSE}$)** | $\le$ | **$45.0$** | **$29.15$ - $33.41$** | ✅ **PASSED** |
+| **Weighted Absolute Percentage Error ($\text{WAPE}$)** | $\le$ | **$25.0\%$** | **$14.06\%$ - $14.66\%$** | ✅ **PASSED** |
+
+> [!NOTE]
+> Jika salah satu metrik melanggar ambang batas (misal $R^2 < 0.80$ atau $\text{MAE} > 25.0$), skrip `evaluate.py` menghentikan proses (*exit code 1*), memblokir promosi ke *registry*, dan mencatat kegagalan audit ke `models/evaluation_report.json`.
+
+### 4. Setup GitHub Actions Runner di VM Host beto
+
+Untuk menjalankan alur kerja pada VM Host beto:
+
+```bash
+# 1. Masuk ke direktori kerja runner di Host beto
+mkdir -p ~/actions-runner && cd ~/actions-runner
+
+# 2. Unduh runner package GitHub Actions
+curl -o actions-runner-linux-x64-2.321.0.tar.gz -L https://github.com/actions/runner/releases/download/v2.321.0/actions-runner-linux-x64-2.321.0.tar.gz
+tar xzf ./actions-runner-linux-x64-2.321.0.tar.gz
+
+# 3. Konfigurasi runner menghubungkan ke repositori
+./config.sh --url https://github.com/alberdjuniawan/indonesia-dengue-mlops \
+  --token <GITHUB_RUNNER_REGISTRATION_TOKEN> \
+  --name beto-runner \
+  --labels self-hosted,beto,linux \
+  --work _work
+
+# 4. Pasang dan jalankan sebagai daemon service systemd
+sudo ./svc.sh install
+sudo ./svc.sh start
+sudo ./svc.sh status
+```
+
+### 5. Jejak Audit Transisi Registry (`stage_transition_log.json`)
+
+Setiap promosi otomatis dicatat secara permanen di `models/registry/stage_transition_log.json`:
+
+```json
+{
+  "timestamp": "2026-11-08T13:37:13.619270+00:00",
+  "model_name": "DengueOutbreakForecaster",
+  "version": "5",
+  "from_stage": "Production",
+  "to_stage": "Staging",
+  "archive_existing": false,
+  "reason": "Automated Quality Gate PASSED: R2=0.9568 >= 0.8, MAE=14.47 <= 25.0. Promoted to Staging via CI/CD (LK-08).",
+  "actor": "GitHub Actions (mlops-automation.yaml) on Host beto"
+}
+```
+
+---
+
 ## Tech Stack
 
 - Python 3.12

@@ -424,16 +424,16 @@ def run_experiment_suite(
         },
         {
             "run_name": "run_05_gradient_ensemble",
-            "model": EnsembleGradientRegressor(ridge_weight=0.70, lag_weight=0.30),
+            "model": EnsembleGradientRegressor(ridge_weight=0.68, lag_weight=0.32),
             "params": {
                 "model_type": "ensemble_gradient",
-                "ridge_weight": 0.70,
-                "lag_weight": 0.30,
-                "sub_ridge_alpha": 0.5,
-                "sub_ridge_epochs": 600,
+                "ridge_weight": 0.68,
+                "lag_weight": 0.32,
+                "sub_ridge_alpha": 0.60,
+                "sub_ridge_epochs": 620,
                 "seed": seed,
             },
-            "tags": {"tier": "ensemble", "strategy": "hybrid_lag_climate"},
+            "tags": {"tier": "ensemble", "strategy": "hybrid_lag_climate_tuned_lk08"},
         },
         {
             "run_name": "run_06_pytorch_temporal_mlp",

@@ -46,6 +46,38 @@
       "archive_existing": false,
       "reason": "Incumbent version superseded by the LK-07 challenger on the validation-MAE gate; archived to preserve audit history while freeing the Production slot.",
       "actor": "scripts/registry_lifecycle.py (LK-07)"
+    },
+    {
+      "timestamp": "2026-11-08T13:37:13.619270+00:00",
+      "model_name": "DengueOutbreakForecaster",
+      "version": "5",
+      "from_stage": "Production",
+      "to_stage": "Staging",
+      "archive_existing": false,
+      "reason": "Automated Quality Gate PASSED: R2=0.9568 >= 0.8, MAE=14.47 <= 25.0. Promoted to Staging via CI/CD (LK-08).",
+      "actor": "GitHub Actions (mlops-automation.yaml) on Host beto"
+    },
+    {
+      "timestamp": "2026-11-08T13:43:36.565969+00:00",
+      "model_name": "DengueOutbreakForecaster",
+      "version": "6",
+      "from_stage": "None",
+      "to_stage": "Staging",
+      "archive_existing": false,
+      "reason": "Automated Quality Gate PASSED: R2=0.9664 >= 0.8, MAE=14.37 <= 25.0. Promoted to Staging via CI/CD (LK-08).",
+      "actor": "GitHub Actions (mlops-automation.yaml) on Host beto"
+    },
+    {
+      "timestamp": "2026-11-08T15:47:59.675744+00:00",
+      "model_name": "DengueOutbreakForecaster",
+      "version": "7",
+      "from_stage": "None",
+      "to_stage": "Staging",
+      "archive_existing": false,
+      "reason": "Automated Quality Gate PASSED: R2=0.9664 >= 0.8, MAE=14.37 <= 25.0. Promoted to Staging via CI/CD (LK-08).",
+      "actor": "GitHub Actions (mlops-automation.yaml) on Host beto"
     }
-  ]
+  ],
+  "latest_staging_version": "7",
+  "last_staging_promotion": "2026-11-08T15:47:59.675744+00:00"
 }
