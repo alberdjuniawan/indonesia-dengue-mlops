@@ -1,7 +1,7 @@
 {
   "model_name": "baseline_lag_1",
   "version": "1.0.0",
-  "promoted_at": "2026-11-02T03:22:36.744301+00:00",
+  "promoted_at": "2026-11-08T13:45:20.522021+00:00",
   "metrics": {
     "rmse": 10.0,
     "mae": 8.0,

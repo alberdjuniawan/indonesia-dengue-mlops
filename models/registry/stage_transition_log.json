@@ -56,8 +56,18 @@
       "archive_existing": false,
       "reason": "Automated Quality Gate PASSED: R2=0.9568 >= 0.8, MAE=14.47 <= 25.0. Promoted to Staging via CI/CD (LK-08).",
       "actor": "GitHub Actions (mlops-automation.yaml) on Host beto"
+    },
+    {
+      "timestamp": "2026-11-08T13:43:36.565969+00:00",
+      "model_name": "DengueOutbreakForecaster",
+      "version": "6",
+      "from_stage": "None",
+      "to_stage": "Staging",
+      "archive_existing": false,
+      "reason": "Automated Quality Gate PASSED: R2=0.9664 >= 0.8, MAE=14.37 <= 25.0. Promoted to Staging via CI/CD (LK-08).",
+      "actor": "GitHub Actions (mlops-automation.yaml) on Host beto"
     }
   ],
-  "latest_staging_version": "5",
-  "last_staging_promotion": "2026-11-08T13:37:13.619270+00:00"
+  "latest_staging_version": "6",
+  "last_staging_promotion": "2026-11-08T13:43:36.565969+00:00"
 }

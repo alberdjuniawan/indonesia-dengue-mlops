@@ -1,10 +1,10 @@
 {
   "model_name": "DengueOutbreakForecaster",
-  "champion_run_id": "780b91ed3b9a49f5abcca26e45dcf2c9",
-  "champion_run_name": "run_07_lk7_challenger_tuned",
+  "champion_run_id": "c559857441f3496798a1d2e78d8fc155",
+  "champion_run_name": "run_05_gradient_ensemble",
   "model_family": "gradient_ensemble_regressor",
-  "mlflow_model_version": 5,
-  "registered_alias": "production",
+  "mlflow_model_version": 6,
+  "registered_alias": "champion",
   "dataset_version": "v2.0-data",
   "feature_count": 21,
   "feature_names": [
@@ -32,30 +32,30 @@
   ],
   "best_hyperparameters": {
     "model_type": "ensemble_gradient",
-    "ridge_weight": 0.7,
-    "lag_weight": 0.3,
-    "sub_ridge_alpha": 0.5,
-    "sub_ridge_epochs": 600,
+    "ridge_weight": 0.68,
+    "lag_weight": 0.32,
+    "sub_ridge_alpha": 0.6,
+    "sub_ridge_epochs": 620,
     "seed": 42
   },
   "performance": {
     "validation": {
-      "rmse": 35.687,
-      "mae": 16.576,
-      "r2": 0.9643,
-      "wape": 13.49
+      "rmse": 35.747,
+      "mae": 16.519,
+      "r2": 0.9642,
+      "wape": 13.44
     },
     "holdout_test": {
-      "rmse": 29.445,
-      "mae": 14.469,
+      "rmse": 29.437,
+      "mae": 14.369,
       "r2": 0.9664,
-      "wape": 14.66
+      "wape": 14.56
     },
     "train": {
-      "rmse": 34.844,
-      "mae": 16.472,
-      "r2": 0.9641,
-      "wape": 14.12
+      "rmse": 34.881,
+      "mae": 16.426,
+      "r2": 0.964,
+      "wape": 14.08
     }
   },
   "deployment_recommendation": {
@@ -66,13 +66,8 @@
       "r2_sla_minimum": 0.8,
       "achieved_test_r2": 0.9664,
       "mae_sla_maximum": 25.0,
-      "achieved_test_mae": 14.469,
+      "achieved_test_mae": 14.369,
       "passed": true
     }
-  },
-  "registry_stage": "Production",
-  "lifecycle_assignment": "LK-07",
-  "promoted_at": "2026-11-02T03:22:23.160648+00:00",
-  "promoted_at_lk07": "2026-11-02T03:22:23.192659+00:00",
-  "dvc_lineage_reference": "models/registry/production_model.yaml"
+  }
 }
