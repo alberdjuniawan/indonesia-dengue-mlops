@@ -159,10 +159,32 @@ docker build -t indonesia-dengue-mlops/api:latest .
 docker run -p 8000:8000 indonesia-dengue-mlops/api:latest
 ```
 
-Or deploy with docker-compose:
+Or deploy the full orchestrated stack (`mlflow`, `api`, `prometheus`, `grafana`) with a single Docker Compose command:
 
 ```bash
-docker compose up -d
+# Build and start all integrated services in detached mode
+docker compose up -d --build
+
+# Check running container status & healthchecks
+docker compose ps
+
+# Verify inter-container communication (API -> MLflow over custom bridge network)
+curl -s http://localhost:8000/health
+curl -s http://localhost:8000/v1/mlflow/status
+```
+
+> **Note:** If your environment uses the standalone Compose v2 binary (`docker-compose`), replace `docker compose` with `docker-compose`.
+
+Service endpoints once running:
+- **Inference API (FastAPI):** `http://localhost:8000` (Swagger UI: `http://localhost:8000/docs`)
+- **MLflow Tracking & Registry UI:** `http://localhost:5000`
+- **Prometheus Metrics:** `http://localhost:9090`
+- **Grafana Dashboard:** `http://localhost:3000` (default credentials: `admin` / `admin`)
+
+To stop all services while preserving persistent volumes (`dengue_mlflow_artifacts`, `dengue_prometheus_data`, `dengue_grafana_data`, `./mlflow.db`, `./models`):
+
+```bash
+docker compose down
 ```
 
 ## Project Structure
@@ -214,7 +236,8 @@ indonesia-dengue-mlops/
 │       └── monitoring/
 ├── tests/
 ├── Dockerfile
-├── docker-compose.yml
+├── Dockerfile.mlflow
+├── docker-compose.yaml
 ├── pyproject.toml
 └── uv.lock
 ```
