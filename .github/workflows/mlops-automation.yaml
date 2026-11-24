@@ -156,3 +156,46 @@ jobs:
             models/registry/champion_metadata.json
             models/registry/stage_transition_log.json
           retention-days: 14
+
+  deploy:
+    name: "Tahap 5: Automated Docker Compose Deployment"
+    needs: pipeline
+    if: github.event_name != 'pull_request'
+    runs-on: [self-hosted]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build and start orchestrated services
+        run: |
+          if docker info >/dev/null 2>&1; then
+            DC="docker compose"
+          else
+            DC="sudo -n docker compose"
+          fi
+
+          $DC -f docker-compose.yaml up -d --build --remove-orphans
+          $DC -f docker-compose.yaml ps
+
+      - name: Verify service health and inter-container communication
+        run: |
+          if docker info >/dev/null 2>&1; then
+            DC="docker compose"
+          else
+            DC="sudo -n docker compose"
+          fi
+
+          for i in $(seq 1 12); do
+            if curl -sf http://localhost:8000/health >/dev/null && curl -sf http://localhost:8000/v1/mlflow/status >/dev/null; then
+              echo "Services are healthy and communicating!"
+              break
+            fi
+            echo "Waiting for API & MLflow services ($i/12)..."
+            sleep 5
+          done
+
+          curl -sf http://localhost:8000/health
+          echo ""
+          curl -sf http://localhost:8000/v1/mlflow/status
+          echo ""
+          $DC -f docker-compose.yaml ps
