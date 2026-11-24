@@ -101,6 +101,9 @@ jobs:
           echo "========================================================"
           echo "Starting Automated Model Training (train.py)"
           echo "========================================================"
+          if [ -d mlflow.db ]; then
+            sudo -n rm -rf mlflow.db || rm -rf mlflow.db
+          fi
           uv run python train.py --experiment-name dengue-weekly-forecasting --device cpu
 
       - name: "Tahap 3 & 4: Model Evaluation, Quality Gate & Staging Registry Promotion"
@@ -173,6 +176,12 @@ jobs:
           else
             DC="sudo -n docker compose"
           fi
+
+          if [ -d mlflow.db ]; then
+            sudo -n rm -rf mlflow.db || rm -rf mlflow.db
+          fi
+          touch mlflow.db
+          mkdir -p mlruns models
 
           $DC -f docker-compose.yaml up -d --build --remove-orphans
           $DC -f docker-compose.yaml ps
