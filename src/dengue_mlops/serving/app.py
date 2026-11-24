@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import os
 import time
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import Any
 
+import httpx
 from fastapi import FastAPI, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -184,3 +186,37 @@ def get_performance_stats() -> dict[str, Any]:
 def get_metrics_exposition() -> Response:
     content = metrics.generate_metrics_text()
     return Response(content=content, media_type="text/plain; version=0.0.4; charset=utf-8")
+
+
+@app.get("/v1/mlflow/status")
+def get_mlflow_status() -> dict[str, Any]:
+    """Query the MLflow tracking server over the Docker network to verify service discovery."""
+    tracking_uri = os.getenv("MLFLOW_TRACKING_URI", "").rstrip("/")
+    if not tracking_uri:
+        return {
+            "mlflow_connected": False,
+            "tracking_uri": None,
+            "detail": "MLFLOW_TRACKING_URI is not configured.",
+            "registered_models": [],
+        }
+
+    try:
+        resp = httpx.get(f"{tracking_uri}/api/2.0/mlflow/registered-models/search", timeout=5.0)
+        resp.raise_for_status()
+        payload = resp.json()
+        models = [
+            {
+                "name": m.get("name"),
+                "latest_versions": [
+                    {"version": v.get("version"), "current_stage": v.get("current_stage")}
+                    for v in m.get("latest_versions", [])
+                ],
+            }
+            for m in payload.get("registered_models", [])
+        ]
+        return {"mlflow_connected": True, "tracking_uri": tracking_uri, "registered_models": models}
+    except httpx.HTTPError as exc:
+        raise HTTPException(
+            status_code=503,
+            detail=f"Unable to reach MLflow tracking server at {tracking_uri}: {exc}",
+        ) from exc
