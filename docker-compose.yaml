@@ -1,0 +1,104 @@
+services:
+  mlflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.mlflow
+    image: indonesia-dengue-mlops/mlflow:latest
+    container_name: dengue-ml-mlflow
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./mlflow.db:/mlflow/mlflow.db
+      - ./mlruns:/mlflow/mlruns
+      - mlflow_artifacts:/mlflow/artifacts
+    command: >
+      mlflow server
+      --host 0.0.0.0
+      --port 5000
+      --allowed-hosts localhost:*,127.0.0.1:*,mlflow:*,mlflow:5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --default-artifact-root /mlflow/artifacts
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - dengue-network
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: indonesia-dengue-mlops/api:latest
+    container_name: dengue-ml-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - WORKERS=4
+      - ENV=production
+      - MLFLOW_TRACKING_URI=http://mlflow:5000
+      - MLFLOW_REGISTERED_MODEL=DengueOutbreakForecaster
+    volumes:
+      - ./models:/app/models
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+    networks:
+      - dengue-network
+
+  prometheus:
+    image: prom/prometheus:v2.51.0
+    container_name: dengue-ml-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./deploy/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      - dengue-network
+
+  grafana:
+    image: grafana/grafana:10.4.0
+    container_name: dengue-ml-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      prometheus:
+        condition: service_started
+    networks:
+      - dengue-network
+
+networks:
+  dengue-network:
+    name: dengue-network
+    driver: bridge
+
+volumes:
+  mlflow_artifacts:
+    name: dengue_mlflow_artifacts
+  prometheus_data:
+    name: dengue_prometheus_data
+  grafana_data:
+    name: dengue_grafana_data
