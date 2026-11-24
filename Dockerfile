@@ -15,7 +15,7 @@ ENV PATH="/root/.local/bin:$PATH"
 # Install production serving and data dependencies into standalone virtual environment
 RUN uv venv /opt/venv && \
     uv pip install --python /opt/venv/bin/python \
-    fastapi uvicorn pydantic python-dotenv requests httpx pandas
+    fastapi uvicorn pydantic python-dotenv requests httpx pandas "numpy<2.4"
 
 # --- Runtime Stage ---
 FROM python:3.12-slim AS runtime
