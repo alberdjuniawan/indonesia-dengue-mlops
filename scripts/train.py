@@ -36,6 +36,7 @@ from dengue_mlops.modeling.models import (
     PyTorchTemporalRegressor,
     RidgeRegressionModel,
 )
+from dengue_mlops.modeling.pyfunc_wrapper import DengueMLflowWrapper
 from dengue_mlops.modeling.registry import register_champion
 
 # Silence MLflow agent hints and verbose user warnings for clean output
@@ -53,32 +54,7 @@ DEFAULT_EXPERIMENT_NAME = "dengue-weekly-forecasting"
 DEFAULT_FEATURES_PATH = Path("data/features/features.csv")
 CHAMPION_METADATA_PATH = Path("models/registry/champion_metadata.json")
 REGISTERED_MODEL_NAME = "DengueOutbreakForecaster"
-
-
-class DengueMLflowWrapper(mlflow.pyfunc.PythonModel):
-    """MLflow PyFunc Wrapper ensuring universal inference compatibility."""
-
-    def __init__(self, model: BaseModel, feature_names: list[str]) -> None:
-        self.model = model
-        self.feature_names = feature_names
-
-    def predict(self, context, model_input):
-        # Handle Pandas DataFrame
-        if hasattr(model_input, "values"):
-            if hasattr(model_input, "columns"):
-                available_cols = [c for c in self.feature_names if c in model_input.columns]
-                if len(available_cols) == len(self.feature_names):
-                    data = model_input[self.feature_names].values.tolist()
-                else:
-                    data = model_input.values.tolist()
-            else:
-                data = model_input.values.tolist()
-        elif isinstance(model_input, list):
-            data = model_input
-        else:
-            data = list(model_input)
-
-        return self.model.predict(data)
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 def configure_mlflow(
@@ -197,10 +173,23 @@ def train_single_run(
         signature = infer_signature(sample_input, sample_output)
 
         wrapper = DengueMLflowWrapper(model=model, feature_names=split.feature_names)
-        mlflow.pyfunc.log_model(
-            name="model", python_model=wrapper, signature=signature, input_example=sample_input[:1]
+        model_info = mlflow.pyfunc.log_model(
+            name="model",
+            python_model=wrapper,
+            signature=signature,
+            input_example=sample_input[:1],
+            code_paths=[str(REPO_ROOT / "src" / "dengue_mlops")],
+            pip_requirements=[
+                f"mlflow=={mlflow.__version__}",
+                "cloudpickle==3.1.2",
+                "numpy<2.4",
+                "pandas",
+                "scikit-learn",
+            ],
         )
-        logger.info(f"Model logged as PyFunc artifact under run '{run_id}'.")
+        logger.info(
+            f"Model logged as PyFunc artifact under run '{run_id}' ({model_info.model_uri})."
+        )
 
         # 8. Extra Artifact: Checkpoint JSON file
         checkpoint_dir = Path("models/checkpoints")
@@ -223,6 +212,7 @@ def train_single_run(
             "run_name": run_name,
             "model_name": model_name,
             "model": model,
+            "model_uri": model_info.model_uri,
             "params": params,
             "train_metrics": train_metrics,
             "val_metrics": val_metrics,
@@ -235,7 +225,7 @@ def register_champion_to_mlflow(
 ) -> Any:
     """Register the best performing model to the MLflow Model Registry."""
     run_id = champion_run["run_id"]
-    model_uri = f"runs:/{run_id}/model"
+    model_uri = champion_run.get("model_uri") or f"runs:/{run_id}/model"
     logger.info(
         f"\nRegistering Champion Run '{run_id}' to MLflow Model Registry as '{model_name}'..."
     )
