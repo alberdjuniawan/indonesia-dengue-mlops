@@ -92,6 +92,7 @@ services:
 
   mlflow-serving:
     image: indonesia-dengue-mlops/mlflow-serving:latest
+    pull_policy: never
     restart: unless-stopped
     environment:
       - MLFLOW_MODELS_WORKERS=1
