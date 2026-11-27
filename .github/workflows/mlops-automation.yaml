@@ -113,6 +113,23 @@ jobs:
           echo "========================================================"
           uv run python scripts/evaluate.py --validate --promote-staging --min-r2 0.80 --max-mae 25.0
 
+      - name: "Tahap 4b: Build MLflow Serving Docker Image (LK-10)"
+        run: |
+          echo "========================================================"
+          echo "Building MLflow Model Serving Image via build-docker"
+          echo "========================================================"
+          if docker info >/dev/null 2>&1; then
+            MLFLOW_DISABLE_AGENT_HINT=1 MLFLOW_TRACKING_URI="sqlite:///mlflow.db" \
+              "$(pwd)/.venv/bin/mlflow" models build-docker \
+              -m "models:/DengueOutbreakForecaster@champion" \
+              -n "indonesia-dengue-mlops/mlflow-serving:latest"
+          else
+            sudo -n env "PATH=$PATH" "HOME=$HOME" MLFLOW_DISABLE_AGENT_HINT=1 MLFLOW_TRACKING_URI="sqlite:///mlflow.db" \
+              "$(pwd)/.venv/bin/mlflow" models build-docker \
+              -m "models:/DengueOutbreakForecaster@champion" \
+              -n "indonesia-dengue-mlops/mlflow-serving:latest"
+          fi
+
       - name: Generate Workflow Summary
         if: always()
         run: |
@@ -195,16 +212,18 @@ jobs:
           fi
 
           for i in $(seq 1 12); do
-            if curl -sf http://localhost:8000/health >/dev/null && curl -sf http://localhost:8000/v1/mlflow/status >/dev/null; then
+            if curl -sf http://localhost:8000/health >/dev/null && curl -sf http://localhost:8000/v1/mlflow/status >/dev/null && curl -sf http://localhost:8080/ping >/dev/null; then
               echo "Services are healthy and communicating!"
               break
             fi
-            echo "Waiting for API & MLflow services ($i/12)..."
+            echo "Waiting for API, MLflow & Serving Replicas ($i/12)..."
             sleep 5
           done
 
           curl -sf http://localhost:8000/health
           echo ""
           curl -sf http://localhost:8000/v1/mlflow/status
+          echo ""
+          curl -sf http://localhost:8080/ping
           echo ""
           $DC -f docker-compose.yaml ps
