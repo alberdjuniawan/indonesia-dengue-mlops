@@ -113,6 +113,27 @@ jobs:
           echo "========================================================"
           uv run python scripts/evaluate.py --validate --promote-staging --min-r2 0.80 --max-mae 25.0
 
+      - name: "Tahap 4b: Build MLflow Serving Docker Image (LK-10)"
+        run: |
+          echo "========================================================"
+          echo "Exporting Champion Model & Building Serving Image"
+          echo "========================================================"
+          rm -rf models/mlflow_serving_model
+          MLFLOW_DISABLE_AGENT_HINT=1 MLFLOW_TRACKING_URI="sqlite:///mlflow.db" uv run python -c "
+          import mlflow
+          mlflow.set_tracking_uri('sqlite:///mlflow.db')
+          mlflow.artifacts.download_artifacts(
+              artifact_uri='models:/DengueOutbreakForecaster@champion',
+              dst_path='models/mlflow_serving_model',
+          )
+          "
+          if docker info >/dev/null 2>&1; then
+            docker build -f Dockerfile.mlflow-serving -t indonesia-dengue-mlops/mlflow-serving:latest .
+          else
+            sudo -n docker build -f Dockerfile.mlflow-serving -t indonesia-dengue-mlops/mlflow-serving:latest .
+          fi
+          rm -rf models/mlflow_serving_model
+
       - name: Generate Workflow Summary
         if: always()
         run: |
@@ -124,7 +145,7 @@ jobs:
 
           if [ -f "models/evaluation_report.json" ]; then
             echo "### 📊 Quality Gate & Evaluation Summary" >> $GITHUB_STEP_SUMMARY
-            uv run python -c "
+            python3 -c "
           import json
           report = json.loads(open('models/evaluation_report.json').read())
           metrics = report.get('overall_metrics', {})
@@ -195,16 +216,18 @@ jobs:
           fi
 
           for i in $(seq 1 12); do
-            if curl -sf http://localhost:8000/health >/dev/null && curl -sf http://localhost:8000/v1/mlflow/status >/dev/null; then
+            if curl -sf http://localhost:8000/health >/dev/null && curl -sf http://localhost:8000/v1/mlflow/status >/dev/null && curl -sf http://localhost:8080/ping >/dev/null; then
               echo "Services are healthy and communicating!"
               break
             fi
-            echo "Waiting for API & MLflow services ($i/12)..."
+            echo "Waiting for API, MLflow & Serving Replicas ($i/12)..."
             sleep 5
           done
 
           curl -sf http://localhost:8000/health
           echo ""
           curl -sf http://localhost:8000/v1/mlflow/status
+          echo ""
+          curl -sf http://localhost:8080/ping
           echo ""
           $DC -f docker-compose.yaml ps

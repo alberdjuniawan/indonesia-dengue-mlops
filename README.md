@@ -177,6 +177,7 @@ curl -s http://localhost:8000/v1/mlflow/status
 
 Service endpoints once running:
 - **Inference API (FastAPI):** `http://localhost:8000` (Swagger UI: `http://localhost:8000/docs`)
+- **MLflow Model Serving (Load Balanced, 3 Replicas):** `http://localhost:8080/invocations` (Health: `http://localhost:8080/ping`)
 - **MLflow Tracking & Registry UI:** `http://localhost:5000`
 - **Prometheus Metrics:** `http://localhost:9090`
 - **Grafana Dashboard:** `http://localhost:3000` (default credentials: `admin` / `admin`)
@@ -186,6 +187,93 @@ To stop all services while preserving persistent volumes (`dengue_mlflow_artifac
 ```bash
 docker compose down
 ```
+
+## Model Serving & Horizontal Scaling (LK-10)
+
+Selain layanan FastAPI kustom, model yang telah berstatus `Production` di MLflow Model Registry dapat disajikan secara langsung sebagai REST API standar menggunakan **MLflow Models** dan diskalakan secara horizontal menggunakan **Docker Compose Replicas** dengan load balancer Nginx (`mlflow-lb`).
+
+### 1. Model Serving Lokal (`mlflow models serve`)
+
+Pastikan model `DengueOutbreakForecaster` sudah berstatus `Production` di MLflow Model Registry, lalu jalankan server inferensi lokal (misal pada port `5001` agar tidak bentrok dengan MLflow Tracking UI di port `5000`):
+
+```bash
+MLFLOW_TRACKING_URI=sqlite:///mlflow.db uv run mlflow models serve \
+  -m "models:/DengueOutbreakForecaster/Production" \
+  -p 5001 \
+  --host 0.0.0.0 \
+  --env-manager local
+```
+
+Uji endpoint lokal (`/ping` dan `/invocations`):
+
+```bash
+# Cek status server
+curl -i http://127.0.0.1:5001/ping
+
+# Kirim permintaan prediksi (21 fitur numerik)
+curl -X POST http://127.0.0.1:5001/invocations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "inputs": [[
+      57.0, 60.0, 60.0, 70.0, 63.0, 7.04, 1.0345, 1.0889,
+      26.29, 26.34, 26.3, 85.9, 86.3, 86.47, 86.6, 85.5,
+      351.3, 2.68, 0.5681, 0.823, 5510000.0
+    ]]
+  }'
+# Output: {"predictions": [68.43]}
+```
+
+### 2. Kontainerisasi Model (`mlflow models build-docker`)
+
+Bangun Docker image mandiri yang membungkus model `Production` beserta lingkungan eksekusinya:
+
+```bash
+MLFLOW_TRACKING_URI=sqlite:///mlflow.db uv run mlflow models build-docker \
+  -m "models:/DengueOutbreakForecaster/Production" \
+  -n "indonesia-dengue-mlops/mlflow-serving:latest"
+```
+
+### 3. Mengakses Endpoint API pada Stack Terorkestrasi (3 Replika)
+
+Pada `docker-compose.yaml`, layanan `mlflow-serving` dikonfigurasi dengan `deploy: replicas: 3` dan dilayani di belakang reverse proxy Nginx (`mlflow-lb`) pada port `8080`. Setelah menjalankan `docker compose up -d`:
+
+```bash
+# Verifikasi ketiga replika berjalan dan berstatus healthy
+docker compose ps
+
+# Cek healthcheck melalui load balancer
+curl -i http://localhost:8080/ping
+
+# Kirim request prediksi melalui load balancer (didistribusikan ke 3 replika)
+curl -X POST http://localhost:8080/invocations \
+  -H "Content-Type: application/json" \
+  -d '{
+    "inputs": [[
+      57.0, 60.0, 60.0, 70.0, 63.0, 7.04, 1.0345, 1.0889,
+      26.29, 26.34, 26.3, 85.9, 86.3, 86.47, 86.6, 85.5,
+      351.3, 2.68, 0.5681, 0.823, 5510000.0
+    ]]
+  }'
+```
+
+Jika ingin mengakses salah satu replika secara langsung tanpa melalui load balancer, periksa port host yang dipetakan untuk tiap replika pada output `docker compose ps` (atau gunakan `docker compose port --index=1 mlflow-serving 8080`).
+
+### 4. Menambah Jumlah Replika Secara Dinamis (Dynamic Scaling)
+
+Jumlah instansi `mlflow-serving` dapat dinaikkan atau diturunkan secara langsung (*live*) tanpa menghentikan layanan pendukung lainnya maupun mengubah port publik `8080`:
+
+```bash
+# Scale up menjadi 5 replika secara dinamis
+docker compose up -d --scale mlflow-serving=5
+
+# Verifikasi seluruh 5 replika aktif
+docker compose ps mlflow-serving
+
+# Scale down kembali ke 3 replika (sesuai default deploy.replicas)
+docker compose up -d --scale mlflow-serving=3
+```
+
+> **Catatan:** Untuk mengubah jumlah replika default secara permanen, ubah nilai `deploy.replicas` pada layanan `mlflow-serving` di `docker-compose.yaml`. Nginx (`deploy/nginx/nginx.conf`) menggunakan Docker embedded DNS resolver (`127.0.0.11`) sehingga replika baru otomatis menerima distribusi beban kerja.
 
 ## Project Structure
 
@@ -235,6 +323,11 @@ indonesia-dengue-mlops/
 │       ├── serving/
 │       └── monitoring/
 ├── tests/
+├── deploy/
+│   ├── nginx/
+│   │   └── nginx.conf
+│   └── prometheus/
+│       └── prometheus.yml
 ├── Dockerfile
 ├── Dockerfile.mlflow
 ├── docker-compose.yaml
